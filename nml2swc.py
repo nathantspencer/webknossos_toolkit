@@ -13,8 +13,8 @@ node_radius = sys.argv[2]
 
 
 # Create directory for SWC output
-output_folder_name = os.path.basename(os.path.normpath(nmls_path + '_SWCs'))
-output_folder_path = os.path.dirname(nmls_path) + '/' + output_folder_name
+output_folder_name = 'SWCs'
+output_folder_path = './' + output_folder_name
 
 if not os.path.exists(output_folder_path):
     os.makedirs(output_folder_path)
@@ -55,7 +55,7 @@ for nml in nmls:
 
             output_swc_path = output_folder_path + '/' + os.path.basename(os.path.normpath(nml))[:-4] + '.swc'
             swc = open(output_swc_path, 'a')
-            swc.write(str(node_id) + ' 0 ' + str(node_x) + ' ' + str(node_y) + ' ' + str(node_z) + ' ' + str(node_radius) + ' ' + str(node_parent) + '\n')
+            swc.write(str(node_id) + ' 3 ' + str(node_x) + ' ' + str(node_y) + ' ' + str(node_z) + ' ' + str(node_radius) + ' ' + str(node_parent) + '\n')
             swc.close()
 
 print('All finished!')
