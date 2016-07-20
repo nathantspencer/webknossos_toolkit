@@ -21,6 +21,7 @@ if not os.path.exists(output_folder_path):
 
 
 # Parse NMLs and write SWCs
+rootFlag = True
 for nml in nmls:
     tree = ET.parse(nml)
     things = tree.getroot()
@@ -50,8 +51,11 @@ for nml in nmls:
 
             if node_id in child_list:
                 node_parent = child_parent[child_list.index(node_id)][1]
-            else:
+            elif rootFlag:
                 node_parent = -1
+		rootFlag = False
+	    else:
+		continue
 
             output_swc_path = output_folder_path + '/' + os.path.basename(os.path.normpath(nml))[:-4] + '.swc'
             swc = open(output_swc_path, 'a')
