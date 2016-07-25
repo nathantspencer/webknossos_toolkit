@@ -1,6 +1,19 @@
 # nml_toolkit
 You might know `.nml` files from your favorite online skeletonizing application: WebKnossos. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` files from WebKnossos.
 ***
+### nml_merger
+The python script `nml_merger.py` takes multiple `.nml` files and merges them into one master file containing the skeleton data of all of its components. The resulting `.nml` can be uploaded to WebKnossos and viewed as one skeleton. The script takes as arguments first the directory containing the files to be merged, and then the full path to the output file.
+
+**EX:** `$ python nml_merger.py 'path\to\nml\directory' 'path\to\output.nml'`
+
+Compatability with Knossos files is a known limitation of this script. As it stands, it is only capable of merging files from WebKnossos. The file format of Knossos files is slightly different and is not yet accounted for. Knossos files will be skipped and display a warning message, but will not terminate the merging process.
+***
+### nml_splitter
+The python script `nml_splitter.py` takes one or more `.nml` files as arguments and splits them into multiple skeletons. Each `<thing>` in the file will become its own `.nml`, with branchpoints and comments preserved.  Output files will retain their original file name with a numbering appended, e.g. `output.nml` will become `output1.nml`, `output2.nml`, etc. A usage example is shown below.
+
+**EX:** `$ python nml_splitter.py 'path\to\master.nml' 'path\to\another.nml'`
+
+***
 ### nml2swc
 The python script `nml2swc.py` can be used to convert all `.nml` files in a directory into `.swc` files with a given radius. The script takes two arguments: the full path to the directory containing your `.nml`s, and the integer radius you'd like to assign to each node of the resulting `.swc`s. A directory named `/SWCs` is added to the directory from which the script is called and is populated as the skeletons are converted.
 
