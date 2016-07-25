@@ -1,12 +1,12 @@
 # nml_toolkit
-You might know `.nml` files from your favorite online skeletonizing application: WebKnossos. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` files from WebKnossos.
+You might know `.nml` files from your favorite online skeletonizing application: webKnossos. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` files from webKnossos.
 ***
 ### nml_merger
-The python script `nml_merger.py` takes multiple `.nml` files and merges them into one master file containing the skeleton data of all of its components. The resulting `.nml` can be uploaded to WebKnossos and viewed as one skeleton. The script takes as arguments first the directory containing the files to be merged, and then the full path to the output file.
+The python script `nml_merger.py` takes multiple `.nml` files and merges them into one master file containing the skeleton data of all of its components. The resulting `.nml` can be uploaded to webKnossos and viewed as one skeleton. The script takes as arguments first the directory containing the files to be merged, and then the full path to the output file.
 
 **EX:** `$ python nml_merger.py 'path\to\nml\directory' 'path\to\output.nml'`
 
-Compatability with Knossos files is a known limitation of this script. As it stands, it is only capable of merging files from WebKnossos. The file format of Knossos files is slightly different and is not yet accounted for. Knossos files will be skipped and display a warning message, but will not terminate the merging process.
+Compatability with Knossos files is a known limitation of this script. As it stands, it is only capable of merging files from webKnossos. The file format of Knossos files is slightly different and is not yet accounted for. Knossos files will be skipped and display a warning message, but will not terminate the merging process.
 ***
 ### nml_splitter
 The python script `nml_splitter.py` takes one or more `.nml` files as arguments and splits them into multiple skeletons. Each `<thing>` in the file will become its own `.nml`, with branchpoints and comments preserved.  Output files will retain their original file name with a numbering appended, e.g. `output.nml` will become `output1.nml`, `output2.nml`, etc. A usage example is shown below.
@@ -22,7 +22,7 @@ The python script `nml2swc.py` can be used to convert all `.nml` files in a dire
 The example above converts all `.nml` files contained in `path\to\nml\directory` to `.swc` files with radii of 15. 
 ***
 ### swc_corrector
-The python script `swc_corrector.py` can be used to enforce proper ordering of an `.swc` file's vertices. For example, if you use `nml2swc.py` to create an `.swc` from a WebKnossos skeleton whose nodes are not ordered as consecutive natural numbers, the ordering of the resulting file will need to be standardized. This can be done by running placing the `.swc` files in need of correction in the `/swcs_to_correct` directory, and then running the script as shown below.
+The python script `swc_corrector.py` can be used to enforce proper ordering of an `.swc` file's vertices. For example, if you use `nml2swc.py` to create an `.swc` from a webKnossos skeleton whose nodes are not ordered as consecutive natural numbers, the ordering of the resulting file will need to be standardized. This can be done by running placing the `.swc` files in need of correction in the `/swcs_to_correct` directory, and then running the script as shown below.
 
 **EX:** `$ python swc_corrector.py`
 
