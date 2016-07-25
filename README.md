@@ -1,6 +1,18 @@
 # **webknossos_toolkit**
+
 You might know `.nml` files from your favorite online skeletonizing application: webKnossos. You might have pockets full of `.zip` files of raw image data from your tracings. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` and `.zip` files from webKnossos.
-***
+
+## **jump to section**
+##### [nml_tools](https://github.com/nathantspencer/webknossos_toolkit#nml_tools)
+* [nml_merger](https://github.com/nathantspencer/webknossos_toolkit#nml_merger)
+* [nml_splitter](https://github.com/nathantspencer/webknossos_toolkit#nml_splitter)
+* [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
+* [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
+* [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
+* [swc_segmenter](https://github.com/nathantspencer/webknossos_toolkit#swc_segmenter)
+##### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools)
+* [zip_splitter](https://github.com/nathantspencer/webknossos_toolkit#zip_splitter)
+
 ## **nml_tools**
 
 ### nml_merger
@@ -38,7 +50,6 @@ Following the command given above, `file.obj` will be created in the same direct
 ### swc_segmenter
 This script is still under construction! Check back soon for details.
 
-***
 ## **zip_tools**
 
 ### zip_splitter
