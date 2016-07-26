@@ -2,6 +2,7 @@ import code
 import glob
 
 for file in glob.glob('swcs_to_correct/*.swc'):
+    print(file)
     lines_to_write = []
     index_map = {'-1':-1}
     f = open(file, 'r')

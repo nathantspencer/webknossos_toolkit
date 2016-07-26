@@ -51,11 +51,8 @@ for nml in nmls:
 
             if node_id in child_list:
                 node_parent = child_parent[child_list.index(node_id)][1]
-            elif rootFlag:
+            else:
                 node_parent = -1
-		rootFlag = False
-	    else:
-		continue
 
             output_swc_path = output_folder_path + '/' + os.path.basename(os.path.normpath(nml))[:-4] + '.swc'
             swc = open(output_swc_path, 'a')
