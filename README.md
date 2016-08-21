@@ -10,7 +10,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
 
 ### [swc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
-* [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
+* [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
 
 #### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools-1)
