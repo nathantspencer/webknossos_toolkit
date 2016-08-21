@@ -103,7 +103,7 @@ def write_swc(nmls_path, radius=0):
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
         print('\nNML2SWC -- Written by Nathan Spencer 2016')
-        print('Usage: python swc2hoc.py ["path/to/nml/file.nml" || "path/to/nml/folder"] [radius]')
+        print('Usage: python nml2swc.py ["path/to/nml/file.nml" || "path/to/nml/folder"] [radius]')
         print('Note: radius argument is optional; radius from nml will be used by default')
     elif len(sys.argv) == 2:
         write_swc(sys.argv[1])
