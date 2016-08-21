@@ -1,7 +1,23 @@
 # **webknossos_toolkit**
+
 You might know `.nml` files from your favorite online skeletonizing application: webKnossos. You might have pockets full of `.zip` files of raw image data from your tracings. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` and `.zip` files from webKnossos.
-***
-## **nml_tools**
+
+# **table of contents**
+
+#### [nml_tools](https://github.com/nathantspencer/webknossos_toolkit#nml_tools-1)
+* [nml_merger](https://github.com/nathantspencer/webknossos_toolkit#nml_merger)
+* [nml_splitter](https://github.com/nathantspencer/webknossos_toolkit#nml_splitter)
+* [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
+* [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
+* [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
+* [swc_segmenter](https://github.com/nathantspencer/webknossos_toolkit#swc_segmenter)
+
+#### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools-1)
+* [zip_splitter](https://github.com/nathantspencer/webknossos_toolkit#zip_splitter)
+
+
+# **nml_tools**
+
 
 ### nml_merger
 The python script `nml_merger.py` takes multiple `.nml` files and merges them into one master file containing the skeleton data of all of its components. The resulting `.nml` can be uploaded to webKnossos and viewed as one skeleton. The script takes as arguments first the directory containing the files to be merged, and then the full path to the output file.
@@ -38,8 +54,7 @@ Following the command given above, `file.obj` will be created in the same direct
 ### swc_segmenter
 This script is still under construction! Check back soon for details.
 
-***
-## **zip_tools**
+# **zip_tools**
 
 ### zip_splitter
 The MATLAB script `zip_splitter.m` can be used to take a webKnossos `.zip` containing multiple cells and split it into multiple files corresponding to each cell. The `.zip` should be placed in `/zip_splitter`. The output files will be created in this directory as well. A usage example is shown below.
