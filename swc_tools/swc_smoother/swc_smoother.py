@@ -1,36 +1,54 @@
 import sys
-import numpy
+import code
 
 def swc_smooth(swc_file, allowable_change):
 
     f = open(swc_file, 'r')
     lines = f.readlines()
-    radii = []
-    parents = []
+    f.close()
+    radii = {}
+    parents = {}
+    xs = {}
+    ys = {}
+    zs = {}
     for line in lines:
-        radii.append(float(line.split(' ')[5]))
-        parents.append(int(line.split(' ')[6]))
+        radii[int(line.split(' ')[0])] = float(line.split(' ')[5].strip())
+        #print line.split(' ')[0]
+        parents[int(line.split(' ')[0])] = int(line.split(' ')[6].strip())
+        xs[int(line.split(' ')[0])] = float(line.split(' ')[2].strip())
+        ys[int(line.split(' ')[0])] = float(line.split(' ')[3].strip())
+        zs[int(line.split(' ')[0])] = float(line.split(' ')[4].strip())
 
     new_radii = []
-    for i in range(len(radii)):
-        if i > 0 and i < len(radii)-1:
-            if radii[i] > (radii[i - 1] * allowable_change):
-                new_radii.append(round(radii[i] / numpy.sqrt(allowable_change), 4))
-            elif radii[i] < (radii[i - 1] / allowable_change):
-                new_radii.append(round(radii[i] * numpy.sqrt(allowable_change), 4))
-            else:
-                new_radii.append(radii[i])
-        else:
-            new_radii.append(radii[i])
+    count = 4
+    while count > 3:
+        count = 0
+        for each in radii.keys():
+            if parents[each] == -1:
+                continue
 
-    f.close()
+            parent = parents[each]
+            radchild = radii[each]
+            raddad = radii[parent]
+            if raddad == 0 or radchild == 0:
+                continue
+            if ((radchild /raddad) > allowable_change):
+                radii[each] = raddad * allowable_change
+                count += 1
+            if (raddad/radchild) > allowable_change:
+                radii[each] = raddad / allowable_change
+                count += 1
+        print "count: "  + str(count)
+
+
+
     f = open(swc_file[:-4] + '_smooth.swc', 'w')
 
-    for i in range(len(lines)):
-        f.write(lines[i].split(' ')[0] + ' ' + lines[i].split(' ')[1] + ' ' + \
-            lines[i].split(' ')[2] + ' ' + lines[i].split(' ')[3] + ' ' + \
-            lines[i].split(' ')[4] + ' ' + str(new_radii[i]) + ' ' + \
-            str(parents[i]) + '\n')
+    for i in radii.keys():
+        print i
+        #code.interact(local=locals())
+        f.write(str(i) + ' 3 ' + str(xs[i]) + ' ' + str(ys[i]) + ' ' + str(zs[i]) + ' ' + \
+            str(radii[i]) + ' ' + str(parents[i]) + '\n')
 
 
 if __name__ == "__main__":
