@@ -1,6 +1,8 @@
 import matlab.engine
 import scipy.io as sio
 import sys
+import numpy
+import code
 
 def write_hoc(swc_path):
 
@@ -19,6 +21,8 @@ def write_hoc(swc_path):
     for x in range(len(sections)):
         parent_list.append(sections[x][1])
     branchpoints = mat['branchpoints'].tolist()
+
+    code.interact(local=locals())
 
     f = open(swc_path[:-4] + '.hoc', 'w')
     f.write('objref soma\nsoma = new SectionList()\n')
@@ -45,6 +49,23 @@ def write_hoc(swc_path):
         f.write('dendrite.append()\n')
         f.write('connect sections[' + str(i) + '](0), sections[' + str(parent) + '](1)\n')
         f.write('sections[' + str(i) +'] {\n')
+
+        # UNCOMMENT CODE BELOW TO HELP IDENTIFY PROBLEM SECTIONS
+        # IF THERE ARE LARGE JUMPS IN YOUR RESULTING HOCCODE --
+        # SOMETIMES THE TREES TOOLBOX FAILS TO FIND A BRANCH
+
+        # x_last = float(swc_lines[sections[i][0]].split(' ')[2])
+        # y_last = float(swc_lines[sections[i][0]].split(' ')[3])
+        # z_last = float(swc_lines[sections[i][0]].split(' ')[4])
+
+        # x_next = float(swc_lines[sections[i-1][1]+1].split(' ')[2])
+        # y_next = float(swc_lines[sections[i-1][1]+1].split(' ')[3])
+        # z_next = float(swc_lines[sections[i-1][1]+1].split(' ')[4])
+
+        # distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
+        # if distance > 400:
+        #     print(str(i) + ': ' + str(distance))
+
         for j in range(sections[i-1][1], sections[i][1]):
             f.write('  pt3dadd(')
             f.write(swc_lines[j].split(' ')[2] + ', ')
