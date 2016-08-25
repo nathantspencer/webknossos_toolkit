@@ -10,6 +10,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
 
 ### [swc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
+* [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
 
@@ -44,6 +45,11 @@ The python script `nml2swc.py` can be used to convert all `.nml` files in a dire
 Note that in the second usage example, the radius for each node will be taken from the `.nml` file given as the first argument because no second argument was given.
 
 # **swc_tools**
+
+### swc_center
+The python script `swc_center.py` takes as an argument the path to an `swc` file. An `.swc` will be created in the same directory as the target file, with `_centered` appended to the original file name. The new swc will be centered around (0, 0, 0). Note that this will result in negative coordinates. A usage example is shown below:
+
+**EX:** `$ python swc_center 'path\to\swc\file.swc'`
 
 ### swc2hoc
 The python script `swc2hoc.py` takes as an argument the path to an `.swc` file or a directory containing `.swc` files. A `.hoc` file will be created in the same directory as the `.swc` file. Note that this script requires MATLAB and the [MATLAB engine for python](http://www.mathworks.com/help/matlab/matlab-engine-for-python.html), which are used to make calls to functions in the [TREES Toolbox](http://www.treestoolbox.org/).
