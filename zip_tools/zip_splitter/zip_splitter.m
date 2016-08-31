@@ -10,6 +10,7 @@ function zip_splitter(zip_file)
 %   Created June 2016 by Nathan Spencer
 %
 %--------------------------------------------------------------------------
+
 %% Setup and declarations
 
 zip_file_name = zip_file(1:length(zip_file)-4);
