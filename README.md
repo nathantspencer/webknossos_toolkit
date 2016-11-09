@@ -60,6 +60,14 @@ It is also worth noting that this script assumes the first branch in your `.swc`
 
 **EX:** `$ python swc2hoc.py 'path\to\swc\directory'`
 
+Another script in the `/swc2hoc` directory is `hoc_commenter.py`, which can be used to label each section in a `.hoc` file produced by `swc2hoc.py` according to the branch number for each branch order. For example, a section labeled `// d1` is the first branch. A section labeled `// d1,2` is the second of the branches descending from the first branch. A section labeled `// d2,1,3` is the third branch descending from the first branch descending from the second branch.
+
+The resulting `.hoc` file will be saved in the same directory as the input file, but with `_commented` appended to the file name. A usage example is given below.
+
+**EX:** `$ python hoc_commenter.py 'path\to\swc\file.swc'`
+
+Note that `hoc_commenter.py` is not yet equipped to handle an entire directory as an argument.
+
 ### swc2obj
 The python script `swc2obj.py` will convert a given `.swc` into a point cloud `.obj` file for viewing in MeshLab, Blender, and other similar tools. It takes as an argument the full path to the `.swc` file of interest or to a directory containing `.swc` files, and places the resulting `.obj` file(s) alongisde the input file in its parent directory. Usage examples are given below.
 
