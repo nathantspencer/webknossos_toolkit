@@ -11,7 +11,15 @@ def comment(swc_path):
 		if line == "access sections[0]\n":
 			soma_comment_index = ii - 1
 			break
-	swc_lines.insert(soma_comment_index, '// single node indicating soma\n')
+	swc_lines.insert(soma_comment_index, '// soma\n')
+
+	# add comment line to indicate first branch
+	branch1_comment_index = -1
+	for ii, line in enumerate(swc_lines):
+		if line == "access sections[1]\n":
+			branch1_comment_index = ii - 1
+			break
+	swc_lines.insert(branch1_comment_index, '\n// d1')
 
 	# save the updated hoc with the same path but altered name
 	f = open(swc_path[:-4] + "_commented.hoc", 'w')
