@@ -3,6 +3,7 @@ import sys
 import code
 import scipy.io as sio
 import re
+import time
 from operator import itemgetter
 
 def reparent(data, id):
@@ -206,7 +207,7 @@ def write_hoc(swc_path):
 			f.write(swc_lines[j].split(' ')[5] + ')\n')
 		f.write('}\n\n')
 
-	print(swc_path[:-4] + '.hoc\n')
+	print(swc_path[:-4] + '.hoc')
 
 def true_root(swc_path):
 
@@ -219,11 +220,13 @@ def true_root(swc_path):
 	return 0
 
 if __name__ == "__main__":
+
 	# argument check
 	if len(sys.argv) != 2:
 		print('\nSWC2HOC.PY 2016');
 		print('Usage: $ python swc2hoc.py "path/to/swc/file.swc"')
 	else:
+		start = time.time()
 		swc_path = sys.argv[1]
 
 		# correct order
@@ -247,3 +250,6 @@ if __name__ == "__main__":
 
 		# comment
 		comment(swc_path[:-4] + '.hoc')
+
+		end = time.time()
+		print("Finished in " + str(end - start) + " seconds\n")
