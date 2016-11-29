@@ -52,7 +52,7 @@ The python script `swc_center.py` takes as an argument the path to an `swc` file
 **EX:** `$ python swc_center 'path\to\swc\file.swc'`
 
 ## swc2hoc
-The python script `swc2hoc.py` takes as an argument the path to an `.swc` file. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. Note that this script requires MATLAB and the [MATLAB engine for python](http://www.mathworks.com/help/matlab/matlab-engine-for-python.html), which are used to make calls to functions in the [TREES Toolbox](http://www.treestoolbox.org/). A usage example is given below.
+The python script `swc2hoc.py` takes as an argument the path to an `.swc` file. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. A usage example is given below.
 
 **EX:** `$ python swc2hoc.py 'path\to\swc\file.swc'`
 
