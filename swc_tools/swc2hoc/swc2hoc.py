@@ -1,9 +1,9 @@
-import matlab.engine
 import numpy as np
 import sys
 import code
 import scipy.io as sio
 import re
+from operator import itemgetter
 
 def reparent(data, id):
 
@@ -104,63 +104,101 @@ def correct(file):
 		f.write(line + '\n')
 	f.close()
 
+# find and returns a list of tuples (beginning node id of section, end node id of section)
+def sections(swc_path):
+	f = open(swc_path, 'r')
+	swc_lines = f.readlines()
+
+	# create dict that maps node id to list of that node's children
+	id_2_children = dict()
+	for line in swc_lines:
+		line.strip()
+		current_line_id = int(line.split()[0])
+		current_line_parent = int(line.split()[6])
+		if (current_line_parent in id_2_children):
+			id_2_children[current_line_parent].append(current_line_id)
+		else:
+			id_2_children[current_line_parent] = [current_line_id]
+
+	# depth first search, start new section when branchpoint or endpoint is encountered
+	dfs_stack = [(1,1)]
+	bpoints = branchpoints(swc_path)
+	segments = [(1,1)]
+
+	while(dfs_stack):
+		current_tuple = dfs_stack.pop()
+		current_node = current_tuple[0]
+		current_first = current_tuple[1]
+
+		if((current_node in bpoints) or (not current_node in id_2_children)):
+			current_segment = (current_first, current_node)
+			segments.append((current_segment))
+			current_first = current_node
+
+		if current_node in id_2_children:
+			for child in id_2_children[current_node]:
+				dfs_stack.append((child, current_first))
+
+	return sorted(segments, key=itemgetter(1))
+import matlab.engine
+
+# finds and returns list of branchpoints indices (1-indexed)
+def branchpoints(swc_path):
+	f = open(swc_path, 'r')
+	swc_lines = f.readlines()
+
+	has_child = []
+	bpoints = []
+
+	for line in swc_lines:
+		line.strip()
+		current_line_parent = line.split()[6]
+
+		# has_child will contain nodes with 1 or more children
+		# bpoints will contain nodes with 2 or more children
+		if (int(current_line_parent) in bpoints):
+			continue
+		elif (current_line_parent in has_child):
+			bpoints.append(int(current_line_parent))
+		else:
+			has_child.append(current_line_parent)
+
+	return sorted(bpoints)
+
+
 def write_hoc(swc_path):
 
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
-	print('\nFiring up the MATLAB engine...')
-	eng = matlab.engine.start_matlab()
-
-	print('Performing TREES Toolbox analysis...\n')
-	success = eng.trees_analysis(swc_path)
-	mat = sio.loadmat('vars.mat')
-
-	sections = mat['sect'].tolist()
+	secs = sections(swc_path)
 	parent_list = []
-	for x in range(len(sections)):
-		parent_list.append(sections[x][1])
-	branchpoints = mat['branchpoints'].tolist()
+	for x in range(len(secs)):
+		parent_list.append(secs[x][1])
 
 	f = open(swc_path[:-4] + '.hoc', 'w')
 	f.write('objref soma\nsoma = new SectionList()\n')
 	f.write('objref dendrite\ndendrite = new SectionList()\n\n')
 
 	# First segment will be written as the soma section
-	print('\nWriting .hoc file...')
-	f.write('create sections[' + str(len(sections)) + ']\n')
+	print('Writing .hoc file...')
+	f.write('create sections[' + str(len(secs)) + ']\n')
 	f.write('access sections[0]\n')
 	f.write('soma.append()\nsections[0] {\n')
 
-	for i in range(sections[0][0], sections[0][1]):
+	for i in range(secs[0][0], secs[0][1]):
 		f.write(swc_lines[i].split(' ')[5] + ')\n')
 	f.write('}\n\n')
 
 	# All following sections are assumed to be dendrite sections
-	for i in range(1, len(sections)):
-		parent = parent_list.index(sections[i][0])
+	for i in range(1, len(secs)):
+		parent = parent_list.index(secs[i][0])
 		f.write('access sections[' + str(i) + ']\n')
 		f.write('dendrite.append()\n')
 		f.write('connect sections[' + str(i) + '](0), sections[' + str(parent) + '](1)\n')
 		f.write('sections[' + str(i) +'] {\n')
 
-		# UNCOMMENT CODE BELOW TO HELP IDENTIFY PROBLEM SECTIONS
-		# IF THERE ARE LARGE JUMPS IN YOUR RESULTING HOCCODE --
-		# SOMETIMES THE TREES TOOLBOX FAILS TO FIND A BRANCH
-
-		# x_last = float(swc_lines[sections[i][0]].split(' ')[2])
-		# y_last = float(swc_lines[sections[i][0]].split(' ')[3])
-		# z_last = float(swc_lines[sections[i][0]].split(' ')[4])
-
-		# x_next = float(swc_lines[sections[i-1][1]+1].split(' ')[2])
-		# y_next = float(swc_lines[sections[i-1][1]+1].split(' ')[3])
-		# z_next = float(swc_lines[sections[i-1][1]+1].split(' ')[4])
-
-		# distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
-		# if distance > 400:
-		#	 print(str(i) + ': ' + str(distance))
-
-		for j in range(sections[i-1][1], sections[i][1]):
+		for j in range(secs[i-1][1], secs[i][1]):
 			f.write('  pt3dadd(')
 			f.write(swc_lines[j].split(' ')[2] + ', ')
 			f.write(swc_lines[j].split(' ')[3] + ', ')
@@ -168,7 +206,7 @@ def write_hoc(swc_path):
 			f.write(swc_lines[j].split(' ')[5] + ')\n')
 		f.write('}\n\n')
 
-	print(swc_path[:-4] + '.hoc')
+	print(swc_path[:-4] + '.hoc\n')
 
 def true_root(swc_path):
 
@@ -196,7 +234,7 @@ if __name__ == "__main__":
 		if(reparent_root == 0):
 			print('ERROR: No soma found in swc')
 		else:
-			print('True root found at index ' + str(reparent_root))
+			print('\nTrue root found at index ' + str(reparent_root))
 
 		# reparent
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
@@ -204,12 +242,8 @@ if __name__ == "__main__":
 		reparent(data, reparent_root)
 		np.savetxt(swc_path, data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
-		code.interact(local=locals())
-
 		# make hoc code
 		write_hoc(swc_path)
-
-		code.interact(local=locals())
 
 		# comment
 		comment(swc_path[:-4] + '.hoc')
