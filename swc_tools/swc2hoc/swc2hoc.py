@@ -8,14 +8,15 @@ from operator import itemgetter
 
 def reparent(data, id):
 
-	id_index = dict([(rec['id'], i) for i, rec in enumerate(data)])
+	cur_id = id
 	newparent = -1
-	while id != -1:
-		rec = data[id_index[id]]
-		oldparent = rec['parent']
-		rec['parent'] = newparent
-		newparent = id
-		id = oldparent
+	while cur_id != -1:
+		line = data[cur_id - 1]
+		oldparent = line['parent']
+		line['parent'] = newparent
+		newparent = cur_id
+		cur_id = oldparent
+	np.savetxt(swc_path, data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 def comment(hoc_path):
 
@@ -150,6 +151,7 @@ def branchpoints(swc_path):
 
 	has_child = []
 	bpoints = []
+	id_index = dict([(rec['id'], i) for i, rec in enumerate(data)])
 
 	for line in swc_lines:
 		line.strip()
@@ -190,6 +192,8 @@ def write_hoc(swc_path):
 	for i in range(secs[0][0], secs[0][1]):
 		f.write(swc_lines[i].split(' ')[5] + ')\n')
 	f.write('}\n\n')
+
+	print(secs)
 
 	# All following sections are assumed to be dendrite sections
 	for i in range(1, len(secs)):
@@ -243,7 +247,6 @@ if __name__ == "__main__":
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
 		data = np.loadtxt(swc_path, dtype=dtype)
 		reparent(data, reparent_root)
-		np.savetxt(swc_path, data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 		# make hoc code
 		write_hoc(swc_path)
