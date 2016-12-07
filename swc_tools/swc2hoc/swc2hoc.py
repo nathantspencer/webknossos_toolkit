@@ -125,7 +125,7 @@ def sections(swc_path):
 	# depth first search, start new section when branchpoint or endpoint is encountered
 	dfs_stack = [(1,1)]
 	bpoints = branchpoints(swc_path)
-	segments = [(1,1)]
+	segments = []
 
 	while(dfs_stack):
 		current_tuple = dfs_stack.pop()
@@ -188,10 +188,19 @@ def write_hoc(swc_path):
 	f.write('create sections[' + str(len(secs)) + ']\n')
 	f.write('access sections[0]\n')
 	f.write('soma.append()\nsections[0] {\n')
+	
+	r = range(secs[0][0], secs[0][1])
 
-	for i in range(secs[0][0], secs[0][1]):
-		f.write(swc_lines[i].split(' ')[5] + ')\n')
-	f.write('}\n\n')
+# The fuck is this shit? The 5th element of swc_lines? wuuut
+	if len(r) == 0:
+		f.write(swc_lines[0].split(' ')[5] + ')\n')
+		print swc_lines[0].split(' ')
+		f.write('}\n\n')
+	else:
+		for i in r:
+			f.write(swc_lines[i].split(' ')[5] + ')\n')
+		
+		f.write('}\n\n')
 
 	print(secs)
 
@@ -252,7 +261,7 @@ if __name__ == "__main__":
 		write_hoc(swc_path)
 
 		# comment
-		comment(swc_path[:-4] + '.hoc')
+		#comment(swc_path[:-4] + '.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
