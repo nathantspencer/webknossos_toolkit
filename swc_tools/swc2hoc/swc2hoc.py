@@ -6,8 +6,7 @@ import re
 import time
 from operator import itemgetter
 
-def reparent(data, id):
-
+def reparent(swc_path, data, id):
 	cur_id = id
 	newparent = -1
 	while cur_id != -1:
@@ -16,10 +15,9 @@ def reparent(data, id):
 		line['parent'] = newparent
 		newparent = cur_id
 		cur_id = oldparent
-	np.savetxt(swc_path, data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
+	np.savetxt(swc_path[:-4] + '_reparent.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 def comment(hoc_path):
-
 	# read lines from hoc file, create dictionaries
 	f = open(hoc_path, 'r')
 	hoc_lines = f.readlines()
@@ -74,10 +72,10 @@ def comment(hoc_path):
 		f.write(line)
 	f.close()
 
-def correct(file):
+def correct(filePath):
 	lines_to_write = []
 	index_map = {'-1':-1}
-	f = open(file, 'r')
+	f = open(filePath, 'r')
 	lines = f.readlines()
 	f.close()
 	n = 1
@@ -100,14 +98,14 @@ def correct(file):
 		line = line + str(new_parent)
 		lines_to_write[n] = line
 		n += 1
-
-	f = open(file, 'w')
+	
+	f = open(filePath[:-4] + 'corrected.swc', 'w')
 	for line in lines_to_write:
 		f.write(line + '\n')
 	f.close()
 
 # find and returns a list of tuples (beginning node id of section, end node id of section)
-def sections(swc_path):
+def sections(swc_path, data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
@@ -124,7 +122,7 @@ def sections(swc_path):
 
 	# depth first search, start new section when branchpoint or endpoint is encountered
 	dfs_stack = [(1,1)]
-	bpoints = branchpoints(swc_path)
+	bpoints = branchpoints(swc_path, data)
 	segments = []
 
 	while(dfs_stack):
@@ -142,10 +140,10 @@ def sections(swc_path):
 				dfs_stack.append((child, current_first))
 
 	return sorted(segments, key=itemgetter(1))
-import matlab.engine
+
 
 # finds and returns list of branchpoints indices (1-indexed)
-def branchpoints(swc_path):
+def branchpoints(swc_path, data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
@@ -169,12 +167,12 @@ def branchpoints(swc_path):
 	return sorted(bpoints)
 
 
-def write_hoc(swc_path):
+def write_hoc(swc_path, data):
 
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
-	secs = sections(swc_path)
+	secs = sections(swc_path, data)
 	parent_list = []
 	for x in range(len(secs)):
 		parent_list.append(secs[x][1])
@@ -190,17 +188,19 @@ def write_hoc(swc_path):
 	f.write('soma.append()\nsections[0] {\n')
 	
 	r = range(secs[0][0], secs[0][1])
-
+	#code.interact(local=locals())
 # The fuck is this shit? The 5th element of swc_lines? wuuut
-	if len(r) == 0:
-		f.write(swc_lines[0].split(' ')[5] + ')\n')
-		print swc_lines[0].split(' ')
-		f.write('}\n\n')
-	else:
-		for i in r:
-			f.write(swc_lines[i].split(' ')[5] + ')\n')
+	f.write('  pt3dadd(')
+	f.write(swc_lines[0].split(' ')[2] + ', ')
+	f.write(swc_lines[0].split(' ')[3] + ', ')
+	f.write(swc_lines[0].split(' ')[4] + ', ')
+	f.write(swc_lines[0].split(' ')[5] + ')\n')
+	f.write('}\n\n')
+	#else:
+	#	for i in r:
+	#		f.write('(' + ' '.join(swc_lines[i].split(' ')[2:5]) + ')\n')
 		
-		f.write('}\n\n')
+	#	f.write('}\n\n')
 
 	print(secs)
 
@@ -232,21 +232,20 @@ def true_root(swc_path):
 			return ii + 1
 	return 0
 
-if __name__ == "__main__":
-
-	# argument check
+def main():
+# argument check
 	if len(sys.argv) != 2:
 		print('\nSWC2HOC.PY 2016');
-		print('Usage: $ python swc2hoc.py "path/to/swc/file.swc"')
+		print('Usage: $ python swc2hoc.py [path/to/swc/file.swc]')
 	else:
 		start = time.time()
 		swc_path = sys.argv[1]
 
 		# correct order
 		correct(swc_path)
-
+		newPath = swc_path[:-4] + 'corrected.swc'
 		# determine true root
-		reparent_root = true_root(swc_path)
+		reparent_root = true_root(newPath)
 		if(reparent_root == 0):
 			print('ERROR: No soma found in swc')
 		else:
@@ -254,14 +253,18 @@ if __name__ == "__main__":
 
 		# reparent
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
-		data = np.loadtxt(swc_path, dtype=dtype)
-		reparent(data, reparent_root)
-
+		data = np.loadtxt(newPath, dtype=dtype)
+		reparent(newPath, data, reparent_root)
+		newPath = newPath[:-4] + '_reparent.swc'
 		# make hoc code
-		write_hoc(swc_path)
+		write_hoc(newPath, data)
 
 		# comment
 		#comment(swc_path[:-4] + '.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
+
+if __name__ == "__main__":
+	main()
+	
