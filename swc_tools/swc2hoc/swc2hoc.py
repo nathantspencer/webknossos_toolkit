@@ -21,8 +21,8 @@ def comment(hoc_path):
 	# read lines from hoc file, create dictionaries
 	f = open(hoc_path, 'r')
 	hoc_lines = f.readlines()
-	section_kidindex = { 1 : 1 }
-	section_prefix = { 1 : 'd1,' }
+	section_kidindex = { 0 : 1, 1 : 1 }
+	section_prefix = { 0 : '' }
 	f.close()
 
 	# add comment line to indicate soma
@@ -33,14 +33,6 @@ def comment(hoc_path):
 			break
 	hoc_lines.insert(soma_comment_index, '// soma\n')
 
-	# add comment line to indicate first branch
-	branch1_comment_index = -1
-	for ii, line in enumerate(hoc_lines):
-		if line == "access sections[1]\n":
-			branch1_comment_index = ii - 1
-			break
-	hoc_lines.insert(branch1_comment_index, '\n// d1')
-
 	# set some key variables, create working copy of hoc text
 	comment_offset = 2
 	pattern = "connect sections\[([0-9]+)\]\(0\), sections\[([0-9]+)\]\(1\)"
@@ -50,18 +42,18 @@ def comment(hoc_path):
 
 	# add comments to the remaining branches
 	for ii, line in enumerate(hoc_lines):
-		if(ii > branch1_comment_index + 4):
+		if(ii > 11):
 			results = re.search(pattern, line)
 			if results:
 
 				# write comment line for branch
 				current = int(results.group(1))
 				parent = int(results.group(2))
-				comment = "// " + section_prefix[parent] + str(section_kidindex[parent]) + "\n"
+				comment = "// d" + section_prefix[parent] + str(section_kidindex[parent]) + "\n"
 				hoc_lines_output.insert(ii - comment_offset, comment)
 
 				# update dictionaries and offset
-				section_prefix[current] = comment[3:-1] + ','
+				section_prefix[current] = comment[4:-1] + ','
 				section_kidindex[parent] = section_kidindex[parent] + 1
 				section_kidindex[current] = 1
 				comment_offset = comment_offset - 1
@@ -219,17 +211,17 @@ def write_hoc(swc_path, data):
 		f.write('}\n\n')
 
 		# UNCOMMENT TO DEBUG JUMPS IN HOC
-		#x_last = float(swc_lines[secs[i][0]].split(' ')[2])
-		#y_last = float(swc_lines[secs[i][0]].split(' ')[3])
-		#z_last = float(swc_lines[secs[i][0]].split(' ')[4])
+		x_last = float(swc_lines[secs[i][0]].split(' ')[2])
+		y_last = float(swc_lines[secs[i][0]].split(' ')[3])
+		z_last = float(swc_lines[secs[i][0]].split(' ')[4])
 
-		#x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
-		#y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
-		#z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
+		x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
+		y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
+		z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
 
-    	#distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
-    	#if distance > 1:
-    	#	print(str(i) + ': ' + str(distance))
+    	distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
+    	if distance > 1:
+    		print(str(i) + ': ' + str(distance))
 
 	print(swc_path[:-4] + '.hoc')
 
@@ -305,7 +297,8 @@ def main():
 		new_path = new_path[:-4] + '_reparent.swc'
 
 		# make hoc code
-		write_hoc(new_path, data)
+		#write_hoc(new_path, data)
+		comment(new_path[:-4] + '.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
