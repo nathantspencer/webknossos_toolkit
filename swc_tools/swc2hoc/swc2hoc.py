@@ -104,7 +104,7 @@ def correct(filePath):
 		lines_to_write[n] = line
 		n += 1
 
-	f = open(filePath[:-4] + 'corrected.swc', 'w')
+	f = open(filePath[:-4] + '_corrected.swc', 'w')
 	for line in lines_to_write:
 		f.write(line + '\n')
 	f.close()
@@ -218,28 +218,60 @@ def write_hoc(swc_path, data):
 			f.write(swc_lines[j].split(' ')[5] + ')\n')
 		f.write('}\n\n')
 
-		x_last = float(swc_lines[secs[i][0]].split(' ')[2])
-		y_last = float(swc_lines[secs[i][0]].split(' ')[3])
-		z_last = float(swc_lines[secs[i][0]].split(' ')[4])
+		# UNCOMMENT TO DEBUG JUMPS IN HOC
+		#x_last = float(swc_lines[secs[i][0]].split(' ')[2])
+		#y_last = float(swc_lines[secs[i][0]].split(' ')[3])
+		#z_last = float(swc_lines[secs[i][0]].split(' ')[4])
 
-		x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
-		y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
-		z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
+		#x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
+		#y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
+		#z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
 
-    	distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
-    	if distance > 1:
-    		print(str(i) + ': ' + str(distance))
+    	#distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
+    	#if distance > 1:
+    	#	print(str(i) + ': ' + str(distance))
 
 	print(swc_path[:-4] + '.hoc')
 
 def true_root(swc_path):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
+	f.close()
 
 	for ii, line in enumerate(swc_lines):
 		if (line.split()[1] == '1'):
 			return ii + 1
 	return 0
+
+# centers the swc around (0, 0, 0) in 3d space
+def subtract_means(swc_path, data):
+	f = open(swc_path, 'r')
+	swc_lines = f.readlines()
+	f.close()
+
+	x_sum = 0
+	y_sum = 0
+	z_sum = 0
+
+	# sum values of x, y, z to calculate mean
+	for cur_id in range(len(swc_lines)):
+		line = data[cur_id]
+		x_sum = x_sum + line['x']
+		y_sum = y_sum + line['y']
+		z_sum = z_sum + line['z']
+
+	x_mean = x_sum / len(swc_lines)
+	y_mean = y_sum / len(swc_lines)
+	z_mean = z_sum / len (swc_lines)
+
+	# make another pass to subtract means
+	for cur_id in range(len(swc_lines)):
+		line = data[cur_id]
+		line['x'] = line['x'] - x_mean
+		line['y'] = line['y'] - y_mean
+		line['z'] = line['z'] - z_mean
+
+	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 def main():
 	# argument check
@@ -249,25 +281,31 @@ def main():
 	else:
 		start = time.time()
 		swc_path = sys.argv[1]
+		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
+		data = np.loadtxt(swc_path, dtype=dtype)
+
+		# subtract means
+		subtract_means(swc_path, data)
+		swc_path = swc_path[:-4] + '_centered.swc'
 
 		# correct order
 		correct(swc_path)
-		newPath = swc_path[:-4] + 'corrected.swc'
+		new_path = swc_path[:-4] + '_corrected.swc'
+
 		# determine true root
-		reparent_root = true_root(newPath)
+		reparent_root = true_root(new_path)
 		if(reparent_root == 0):
 			print('ERROR: No soma found in swc')
 		else:
 			print('\nTrue root found at index ' + str(reparent_root))
 
 		# reparent
-		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
-		data = np.loadtxt(newPath, dtype=dtype)
-		reparent(newPath, data, reparent_root)
-		newPath = newPath[:-4] + '_reparent.swc'
+		data = np.loadtxt(new_path, dtype=dtype)
+		reparent(new_path, data, reparent_root)
+		new_path = new_path[:-4] + '_reparent.swc'
 
 		# make hoc code
-		write_hoc(newPath, data)
+		write_hoc(new_path, data)
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
