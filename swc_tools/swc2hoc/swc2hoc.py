@@ -98,7 +98,7 @@ def correct(filePath):
 		line = line + str(new_parent)
 		lines_to_write[n] = line
 		n += 1
-	
+
 	f = open(filePath[:-4] + 'corrected.swc', 'w')
 	for line in lines_to_write:
 		f.write(line + '\n')
@@ -168,7 +168,6 @@ def branchpoints(swc_path, data):
 
 
 def write_hoc(swc_path, data):
-
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
@@ -186,21 +185,15 @@ def write_hoc(swc_path, data):
 	f.write('create sections[' + str(len(secs)) + ']\n')
 	f.write('access sections[0]\n')
 	f.write('soma.append()\nsections[0] {\n')
-	
+
 	r = range(secs[0][0], secs[0][1])
-	#code.interact(local=locals())
-# The fuck is this shit? The 5th element of swc_lines? wuuut
+
 	f.write('  pt3dadd(')
 	f.write(swc_lines[0].split(' ')[2] + ', ')
 	f.write(swc_lines[0].split(' ')[3] + ', ')
 	f.write(swc_lines[0].split(' ')[4] + ', ')
 	f.write(swc_lines[0].split(' ')[5] + ')\n')
 	f.write('}\n\n')
-	#else:
-	#	for i in r:
-	#		f.write('(' + ' '.join(swc_lines[i].split(' ')[2:5]) + ')\n')
-		
-	#	f.write('}\n\n')
 
 	print(secs)
 
@@ -223,7 +216,6 @@ def write_hoc(swc_path, data):
 	print(swc_path[:-4] + '.hoc')
 
 def true_root(swc_path):
-
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
@@ -233,7 +225,7 @@ def true_root(swc_path):
 	return 0
 
 def main():
-# argument check
+	# argument check
 	if len(sys.argv) != 2:
 		print('\nSWC2HOC.PY 2016');
 		print('Usage: $ python swc2hoc.py [path/to/swc/file.swc]')
@@ -256,15 +248,12 @@ def main():
 		data = np.loadtxt(newPath, dtype=dtype)
 		reparent(newPath, data, reparent_root)
 		newPath = newPath[:-4] + '_reparent.swc'
+
 		# make hoc code
 		write_hoc(newPath, data)
-
-		# comment
-		#comment(swc_path[:-4] + '.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
 
 if __name__ == "__main__":
 	main()
-	
