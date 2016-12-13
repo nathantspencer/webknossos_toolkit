@@ -3,6 +3,7 @@ import sys
 import code
 import scipy.io as sio
 import re
+import os
 import time
 from operator import itemgetter
 
@@ -309,7 +310,6 @@ def reorder_hoc(hoc_path):
 		output_lines.append('\n')
 		for line in section[1]:
 			output_lines.append(line)
-		output_lines.append('\n')
 
 	f = open(hoc_path[:-4] + '_reordered.hoc', 'w')
 	for line in output_lines:
@@ -329,11 +329,11 @@ def main():
 
 		# subtract means
 		subtract_means(swc_path, data)
-		swc_path = swc_path[:-4] + '_centered.swc'
+		new_path = swc_path[:-4] + '_centered.swc'
 
 		# correct order
-		correct(swc_path)
-		new_path = swc_path[:-4] + '_corrected.swc'
+		correct(new_path)
+		new_path = new_path[:-4] + '_corrected.swc'
 
 		# determine true root
 		reparent_root = true_root(new_path)
@@ -356,6 +356,12 @@ def main():
 
 		# comment
 		comment(new_path[:-4] + '.hoc')
+
+		# delete temporary intermediate files
+		os.remove(swc_path[:-4] + '_centered.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds\n")
