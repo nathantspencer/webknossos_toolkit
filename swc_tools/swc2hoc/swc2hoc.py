@@ -95,6 +95,11 @@ def correct(filePath):
 	for line in lines_to_write:
 		new_parent = index_map[(line.split(' ')[6]).strip()]
 		line = line[:-len(line.split(' ')[6])]
+
+		# correct nodes that reference themselves as parent; make root
+		if(line.split(' ')[0] == str(new_parent)):
+			new_parent = -1
+
 		line = line + str(new_parent)
 		lines_to_write[n] = line
 		n += 1
@@ -212,6 +217,18 @@ def write_hoc(swc_path, data):
 			f.write(swc_lines[j].split(' ')[4] + ', ')
 			f.write(swc_lines[j].split(' ')[5] + ')\n')
 		f.write('}\n\n')
+
+		x_last = float(swc_lines[secs[i][0]].split(' ')[2])
+		y_last = float(swc_lines[secs[i][0]].split(' ')[3])
+		z_last = float(swc_lines[secs[i][0]].split(' ')[4])
+
+		x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
+		y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
+		z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
+
+    	distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
+    	if distance > 1:
+    		print(str(i) + ': ' + str(distance))
 
 	print(swc_path[:-4] + '.hoc')
 
