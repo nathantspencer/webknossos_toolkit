@@ -163,7 +163,7 @@ def branchpoints(swc_path, data):
 
 	return sorted(bpoints)
 
-
+# writes hoc code from swc
 def write_hoc(swc_path, data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
@@ -225,6 +225,7 @@ def write_hoc(swc_path, data):
 
 	print(swc_path[:-4] + '.hoc')
 
+# determine the true root using the node marked as "soma" type
 def true_root(swc_path):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
@@ -265,6 +266,56 @@ def subtract_means(swc_path, data):
 
 	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
+# reorders hoc sections by the parent they belong to
+def reorder_hoc(hoc_path):
+	f = open(hoc_path, 'r')
+	hoc_lines = f.readlines()
+	output_lines = []
+	f.close()
+
+	capture_flag = False
+	current_section_lines = []
+	current_section_number = 0
+	section_list = []
+
+	for ii, line in enumerate(hoc_lines):
+		if ii > 11:
+			# if we're in 'capture mode', keep capturing lines until the end of the section
+			if capture_flag:
+				current_section_lines.append(line)
+				if str(line[0]) == '}':
+					capture_flag = False
+
+					# we add a tuple that links the section number to the lines
+					# it contains and also to the section index of its parent
+					pattern = "connect sections\[([0-9]+)\]\(0\), sections\[([0-9]+)\]\(1\)"
+					results = re.search(pattern, current_section_lines[2])
+					section_list.append((current_section_number, current_section_lines, int(results.group(2))))
+					current_section_lines = []
+
+			# when we find the start of the next section, start capturing lines
+			elif line[0:6] == 'access':
+				current_section_lines.append(line)
+				current_section_number = current_section_number + 1
+				capture_flag = True
+
+
+	section_list = sorted(section_list, key=lambda item: item[2])
+
+	# set the output lines for writing to new file
+	for i in range(11):
+		output_lines.append(hoc_lines[i])
+	for section in section_list:
+		output_lines.append('\n')
+		for line in section[1]:
+			output_lines.append(line)
+		output_lines.append('\n')
+
+	f = open(hoc_path[:-4] + '_reordered.hoc', 'w')
+	for line in output_lines:
+		f.write(line)
+	f.close()
+
 def main():
 	# argument check
 	if len(sys.argv) != 2:
@@ -297,7 +348,13 @@ def main():
 		new_path = new_path[:-4] + '_reparent.swc'
 
 		# make hoc code
-		#write_hoc(new_path, data)
+		write_hoc(new_path, data)
+
+		# reorder
+		reorder_hoc(new_path[:-4] + '.hoc')
+		new_path = new_path[:-4]  + '_reordered.hoc'
+
+		# comment
 		comment(new_path[:-4] + '.hoc')
 
 		end = time.time()
