@@ -128,7 +128,7 @@ def sections(swc_path, data):
 		current_node = current_tuple[0]
 		current_first = current_tuple[1]
 
-		if((current_node in bpoints) or (not current_node in id_2_children)):
+		if((current_node in bpoints) or (current_node not in id_2_children)):
 			current_segment = (current_first, current_node)
 			segments.append((current_segment))
 			current_first = current_node
@@ -193,8 +193,6 @@ def write_hoc(swc_path, data):
 	f.write(swc_lines[0].split(' ')[5] + ')\n')
 	f.write('}\n\n')
 
-	print(secs)
-
 	# All following sections are assumed to be dendrite sections
 	for i in range(1, len(secs)):
 		parent = parent_list.index(secs[i][0])
@@ -203,28 +201,41 @@ def write_hoc(swc_path, data):
 		f.write('connect sections[' + str(i) + '](0), sections[' + str(parent) + '](1)\n')
 		f.write('sections[' + str(i) +'] {\n')
 
-		for j in range(secs[i-1][1], secs[i][1]):
+		# Create list of nodes included in current section
+		included_nodes = []
+		next_node = secs[i][1]
+		while(next_node != secs[i][0]):
+			included_nodes.append(next_node-1)
+			next_node = int(swc_lines[next_node-1].split(' ')[6][:-1])
+
+		# Build list of parents in the current range
+		current_parents = []
+		for j in included_nodes:
+			current_parents.append(swc_lines[j].split(' ')[6][:-1])
+
+		# Build map from parents to children, use -1 if no child in the current range
+		parent_to_child = {}
+		for j in included_nodes:
+			current_parent = swc_lines[j].split(' ')[6][:-1]
+			current_child  = swc_lines[j].split(' ')[0]
+			parent_to_child[current_parent] = current_child
+			if current_child not in current_parents:
+				parent_to_child[current_child] = -1
+
+			# Marks the node where we should start writing this section
+			if int(current_parent) == secs[i][0]:
+				start_node = int(swc_lines[j].split(' ')[0])
+
+		# Starting from start_node, traverse and write points
+		current_node = start_node
+		while(current_node != -1):
 			f.write('  pt3dadd(')
-			f.write(swc_lines[j].split(' ')[2] + ', ')
-			f.write(swc_lines[j].split(' ')[3] + ', ')
-			f.write(swc_lines[j].split(' ')[4] + ', ')
-			f.write(swc_lines[j].split(' ')[5] + ')\n')
+			f.write(swc_lines[current_node - 1].split(' ')[2] + ', ')
+			f.write(swc_lines[current_node - 1].split(' ')[3] + ', ')
+			f.write(swc_lines[current_node - 1].split(' ')[4] + ', ')
+			f.write(swc_lines[current_node - 1].split(' ')[5] + ')\n')
+			current_node = int(parent_to_child[str(current_node)])
 		f.write('}\n\n')
-
-		# UNCOMMENT TO DEBUG JUMPS IN HOC
-		x_last = float(swc_lines[secs[i][0]].split(' ')[2])
-		y_last = float(swc_lines[secs[i][0]].split(' ')[3])
-		z_last = float(swc_lines[secs[i][0]].split(' ')[4])
-
-		x_next = float(swc_lines[secs[i-1][1]+1].split(' ')[2])
-		y_next = float(swc_lines[secs[i-1][1]+1].split(' ')[3])
-		z_next = float(swc_lines[secs[i-1][1]+1].split(' ')[4])
-
-    	distance = pow(pow(x_last-x_next, 2)+pow(y_last-y_next,2)+pow(z_last-z_next,2) , 0.5)
-    	if distance > 1:
-    		print(str(i) + ': ' + str(distance))
-
-	print(swc_path[:-4] + '.hoc')
 
 # determine the true root using the node marked as "soma" type
 def true_root(swc_path):
@@ -340,7 +351,7 @@ def main():
 		if(reparent_root == 0):
 			print('ERROR: No soma found in swc')
 		else:
-			print('\nTrue root found at index ' + str(reparent_root))
+			print('\nTrue root found at index ' + str(reparent_root) + '!')
 
 		# reparent
 		data = np.loadtxt(new_path, dtype=dtype)
@@ -364,7 +375,7 @@ def main():
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
 
 		end = time.time()
-		print("Finished in " + str(end - start) + " seconds\n")
+		print("Finished in " + str(end - start) + " seconds.\n")
 
 if __name__ == "__main__":
 	main()
