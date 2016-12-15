@@ -5,6 +5,7 @@ import scipy.io as sio
 import re
 import os
 import time
+import warnings
 from operator import itemgetter
 
 def reparent(swc_path, data, id):
@@ -75,22 +76,22 @@ def correct(filePath):
 	for line in lines:
 		line = line.strip()
 		lines[n-1] = line
-		index_map[line.split(' ')[0]] = n
+		index_map[line.split()[0]] = n
 		n += 1
 
 	for line in lines:
-		new_child = index_map[line.split(' ')[0]]
-		line = line[len(line.split(' ')[0]):]
+		new_child = index_map[line.split()[0]]
+		line = line[len(line.split()[0]):]
 		line = str(new_child) + line
 		lines_to_write.append(line)
 
 	n = 0
 	for line in lines_to_write:
-		new_parent = index_map[(line.split(' ')[6]).strip()]
-		line = line[:-len(line.split(' ')[6])]
+		new_parent = index_map[(line.split()[6]).strip()]
+		line = line[:-len(line.split()[6])]
 
 		# correct nodes that reference themselves as parent; make root
-		if(line.split(' ')[0] == str(new_parent)):
+		if(line.split()[0] == str(new_parent)):
 			new_parent = -1
 
 		line = line + str(new_parent)
@@ -190,10 +191,10 @@ def write_hoc(swc_path, soma_path, data):
 
 	for line in soma_lines:
 		f.write('  pt3dadd(')
-		f.write(line.strip().split(' ')[2] + ', ')
-		f.write(line.strip().split(' ')[3] + ', ')
-		f.write(line.strip().split(' ')[4] + ', ')
-		f.write(line.strip().split(' ')[5] + ')\n')
+		f.write(line.strip().split()[2] + ', ')
+		f.write(line.strip().split()[3] + ', ')
+		f.write(line.strip().split()[4] + ', ')
+		f.write(line.strip().split()[5] + ')\n')
 	f.write('}\n\n')
 
 	# All following sections are assumed to be dendrite sections
@@ -209,25 +210,25 @@ def write_hoc(swc_path, soma_path, data):
 		next_node = secs[i][1]
 		while(next_node != secs[i][0]):
 			included_nodes.append(next_node-1)
-			next_node = int(swc_lines[next_node-1].split(' ')[6][:-1])
+			next_node = int(swc_lines[next_node-1].split()[6])
 
 		# Build list of parents in the current range
 		current_parents = []
 		for j in included_nodes:
-			current_parents.append(swc_lines[j].split(' ')[6][:-1])
+			current_parents.append(swc_lines[j].split()[6])
 
 		# Build map from parents to children, use -1 if no child in the current range
 		parent_to_child = {}
 		for j in included_nodes:
-			current_parent = swc_lines[j].split(' ')[6][:-1]
-			current_child  = swc_lines[j].split(' ')[0]
+			current_parent = swc_lines[j].split()[6]
+			current_child  = swc_lines[j].split()[0]
 			parent_to_child[current_parent] = current_child
 			if current_child not in current_parents:
 				parent_to_child[current_child] = -1
 
 			# Marks the node where we should start writing this section
 			if int(current_parent) == secs[i][0]:
-				start_node = int(swc_lines[j].split(' ')[0])
+				start_node = int(swc_lines[j].split()[0])
 
 		# The first node will be missed by section of length zero (1,1)
 		# We will add it manually here
@@ -240,19 +241,36 @@ def write_hoc(swc_path, soma_path, data):
 		current_node = start_node
 		if secs[i][0] == 1:
 			f.write('  pt3dadd(')
-			f.write(swc_lines[0].split(' ')[2] + ', ')
-			f.write(swc_lines[0].split(' ')[3] + ', ')
-			f.write(swc_lines[0].split(' ')[4] + ', ')
-			f.write(swc_lines[0].split(' ')[5] + ')\n')
+			f.write(swc_lines[0].split()[2] + ', ')
+			f.write(swc_lines[0].split()[3] + ', ')
+			f.write(swc_lines[0].split()[4] + ', ')
+			f.write(swc_lines[0].split()[5] + ')\n')
 		while(current_node != -1):
 			f.write('  pt3dadd(')
-			f.write(swc_lines[current_node - 1].split(' ')[2] + ', ')
-			f.write(swc_lines[current_node - 1].split(' ')[3] + ', ')
-			f.write(swc_lines[current_node - 1].split(' ')[4] + ', ')
-			f.write(swc_lines[current_node - 1].split(' ')[5] + ')\n')
+			f.write(swc_lines[current_node - 1].split()[2] + ', ')
+			f.write(swc_lines[current_node - 1].split()[3] + ', ')
+			f.write(swc_lines[current_node - 1].split()[4] + ', ')
+			f.write(swc_lines[current_node - 1].split()[5] + ')\n')
 			current_node = int(parent_to_child[str(current_node)])
 		f.write('}\n\n')
 	f.close()
+
+# check to make sure there is exactly one node with parent -1
+def validate(swc_path):
+	f = open(swc_path, 'r')
+	lines = f.readlines()
+	f.close()
+	
+	numRoots = 0
+	for line in lines:
+		if line.strip().split()[6] == '-1':
+			numRoots = numRoots + 1
+	
+	if numRoots == 0:
+		print('\nWARNING: Your dendrite skeleton contains a loop and has no root. That is catastrophically bad news.\n')
+	elif numRoots > 1:
+		print('\nWARNING: Your dendrite skeleton has multiple roots. Results of this script are likely garbage.\n')
+	return 0
 
 # determine the true root using the node marked as "soma" type
 def true_root(swc_path):
@@ -388,7 +406,7 @@ def main():
 		# determine true root
 		reparent_root = true_root(new_path)
 		if(reparent_root == 0):
-			print('ERROR: No soma found in swc')
+			print('\nWARNING: The root of your dendrite must have type soma (1). This might go poorly.\n')
 		else:
 			print('\nTrue root found at index ' + str(reparent_root) + '!')
 
@@ -396,6 +414,9 @@ def main():
 		data = np.loadtxt(new_path, dtype=dtype)
 		reparent(new_path, data, reparent_root)
 		new_path = new_path[:-4] + '_reparent.swc'
+
+		# make sure things look kosher with the swc file
+		validate(new_path)
 
 		# make hoc code
 		write_hoc(new_path, new_soma_path, data)
