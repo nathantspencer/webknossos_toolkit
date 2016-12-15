@@ -18,7 +18,7 @@ def reparent(swc_path, data, id):
 		cur_id = oldparent
 	np.savetxt(swc_path[:-4] + '_reparent.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
-def comment(hoc_path):
+def comment(hoc_path, soma_size):
 	# read lines from hoc file, create dictionaries
 	f = open(hoc_path, 'r')
 	hoc_lines = f.readlines()
@@ -43,7 +43,7 @@ def comment(hoc_path):
 
 	# add comments to the remaining branches
 	for ii, line in enumerate(hoc_lines):
-		if(ii > 11):
+		if(ii > 10 + soma_size):
 			results = re.search(pattern, line)
 			if results:
 
@@ -190,13 +190,14 @@ def write_hoc(swc_path, soma_path, data):
 
 	for line in soma_lines:
 		f.write('  pt3dadd(')
-		f.write(line.split(' ')[2] + ', ')
-		f.write(line.split(' ')[3] + ', ')
-		f.write(line.split(' ')[4] + ', ')
-		f.write(line.split(' ')[5] + ')\n')
+		f.write(line.strip().split(' ')[2] + ', ')
+		f.write(line.strip().split(' ')[3] + ', ')
+		f.write(line.strip().split(' ')[4] + ', ')
+		f.write(line.strip().split(' ')[5] + ')\n')
+	f.write('}\n\n')
 
 	# All following sections are assumed to be dendrite sections
-	for i in range(len(secs)):
+	for i in range(1, len(secs)):
 		parent = parent_list.index(secs[i][0])
 		f.write('access sections[' + str(i) + ']\n')
 		f.write('dendrite.append()\n')
@@ -228,8 +229,21 @@ def write_hoc(swc_path, soma_path, data):
 			if int(current_parent) == secs[i][0]:
 				start_node = int(swc_lines[j].split(' ')[0])
 
+		# The first node will be missed by section of length zero (1,1)
+		# We will add it manually here
+		if len(included_nodes) == 0:
+			start_node = 1
+			included_nodes.append('1')
+			parent_to_child['1'] = '-1'
+
 		# Starting from start_node, traverse and write points
 		current_node = start_node
+		if secs[i][0] == 1:
+			f.write('  pt3dadd(')
+			f.write(swc_lines[0].split(' ')[2] + ', ')
+			f.write(swc_lines[0].split(' ')[3] + ', ')
+			f.write(swc_lines[0].split(' ')[4] + ', ')
+			f.write(swc_lines[0].split(' ')[5] + ')\n')
 		while(current_node != -1):
 			f.write('  pt3dadd(')
 			f.write(swc_lines[current_node - 1].split(' ')[2] + ', ')
@@ -282,7 +296,7 @@ def subtract_means(swc_path, data):
 	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 # reorders hoc sections by the parent they belong to
-def reorder_hoc(hoc_path):
+def reorder_hoc(hoc_path, soma_size):
 	f = open(hoc_path, 'r')
 	hoc_lines = f.readlines()
 	output_lines = []
@@ -294,7 +308,7 @@ def reorder_hoc(hoc_path):
 	section_list = []
 
 	for ii, line in enumerate(hoc_lines):
-		if ii > 11:
+		if ii > 10 + soma_size:
 			# if we're in 'capture mode', keep capturing lines until the end of the section
 			if capture_flag:
 				current_section_lines.append(line)
@@ -314,11 +328,10 @@ def reorder_hoc(hoc_path):
 				current_section_number = current_section_number + 1
 				capture_flag = True
 
-
 	section_list = sorted(section_list, key=lambda item: item[2])
 
 	# set the output lines for writing to new file
-	for i in range(11):
+	for i in range(10 + soma_size):
 		output_lines.append(hoc_lines[i])
 	for section in section_list:
 		output_lines.append('\n')
@@ -341,6 +354,10 @@ def main():
 		soma_path = sys.argv[2]
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
 		data = np.loadtxt(swc_path, dtype=dtype)
+
+		f = open(soma_path, 'r')
+		linus = f.readlines()
+		soma_size = len(linus)
 
 		# subtract means
 		subtract_means(swc_path, data)
@@ -366,11 +383,11 @@ def main():
 		write_hoc(new_path, soma_path, data)
 
 		# reorder
-		reorder_hoc(new_path[:-4] + '.hoc')
+		reorder_hoc(new_path[:-4] + '.hoc', soma_size)
 		new_path = new_path[:-4]  + '_reordered.hoc'
 
 		# comment
-		comment(new_path[:-4] + '.hoc')
+		comment(new_path[:-4] + '.hoc', soma_size)
 
 		# delete temporary intermediate files
 		os.remove(swc_path[:-4] + '_centered.swc')
