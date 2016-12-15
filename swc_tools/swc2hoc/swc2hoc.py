@@ -260,12 +260,12 @@ def validate(swc_path):
 	f = open(swc_path, 'r')
 	lines = f.readlines()
 	f.close()
-	
+
 	numRoots = 0
 	for line in lines:
 		if line.strip().split()[6] == '-1':
 			numRoots = numRoots + 1
-	
+
 	if numRoots == 0:
 		print('\nWARNING: Your dendrite skeleton contains a loop and has no root. That is catastrophically bad news.\n')
 	elif numRoots > 1:
@@ -327,7 +327,7 @@ def subtract_means(swc_path, soma_path, data, soma_data):
 		line['z'] = line['z'] - z_mean
 
 	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
-	np.savetxt(soma_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
+	np.savetxt(soma_path[:-4] + '_centered.swc', soma_data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 # reorders hoc sections by the parent they belong to
 def reorder_hoc(hoc_path, soma_size):
