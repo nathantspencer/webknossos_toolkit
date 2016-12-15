@@ -165,7 +165,7 @@ def branchpoints(swc_path, data):
 	return sorted(bpoints)
 
 # writes hoc code from swc
-def write_hoc(swc_path, data):
+def write_hoc(swc_path, soma_path, data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 
@@ -174,27 +174,29 @@ def write_hoc(swc_path, data):
 	for x in range(len(secs)):
 		parent_list.append(secs[x][1])
 
+	f = open(soma_path, 'r')
+	soma_lines = f.readlines()
+	f.close()
+
 	f = open(swc_path[:-4] + '.hoc', 'w')
 	f.write('objref soma\nsoma = new SectionList()\n')
 	f.write('objref dendrite\ndendrite = new SectionList()\n\n')
 
-	# First segment will be written as the soma section
+	# First segment will be written as the soma section using the soma swc
 	print('Writing .hoc file...')
 	f.write('create sections[' + str(len(secs)) + ']\n')
 	f.write('access sections[0]\n')
 	f.write('soma.append()\nsections[0] {\n')
 
-	r = range(secs[0][0], secs[0][1])
-
-	f.write('  pt3dadd(')
-	f.write(swc_lines[0].split(' ')[2] + ', ')
-	f.write(swc_lines[0].split(' ')[3] + ', ')
-	f.write(swc_lines[0].split(' ')[4] + ', ')
-	f.write(swc_lines[0].split(' ')[5] + ')\n')
-	f.write('}\n\n')
+	for line in soma_lines:
+		f.write('  pt3dadd(')
+		f.write(line.split(' ')[2] + ', ')
+		f.write(line.split(' ')[3] + ', ')
+		f.write(line.split(' ')[4] + ', ')
+		f.write(line.split(' ')[5] + ')\n')
 
 	# All following sections are assumed to be dendrite sections
-	for i in range(1, len(secs)):
+	for i in range(len(secs)):
 		parent = parent_list.index(secs[i][0])
 		f.write('access sections[' + str(i) + ']\n')
 		f.write('dendrite.append()\n')
@@ -236,6 +238,7 @@ def write_hoc(swc_path, data):
 			f.write(swc_lines[current_node - 1].split(' ')[5] + ')\n')
 			current_node = int(parent_to_child[str(current_node)])
 		f.write('}\n\n')
+	f.close()
 
 # determine the true root using the node marked as "soma" type
 def true_root(swc_path):
@@ -329,12 +332,13 @@ def reorder_hoc(hoc_path):
 
 def main():
 	# argument check
-	if len(sys.argv) != 2:
+	if len(sys.argv) != 3:
 		print('\nSWC2HOC.PY 2016');
-		print('Usage: $ python swc2hoc.py [path/to/swc/file.swc]')
+		print('Usage: $ python swc2hoc.py [dendriteSkeleton.swc] [somaSkeleton.swc]')
 	else:
 		start = time.time()
 		swc_path = sys.argv[1]
+		soma_path = sys.argv[2]
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
 		data = np.loadtxt(swc_path, dtype=dtype)
 
@@ -359,7 +363,7 @@ def main():
 		new_path = new_path[:-4] + '_reparent.swc'
 
 		# make hoc code
-		write_hoc(new_path, data)
+		write_hoc(new_path, soma_path, data)
 
 		# reorder
 		reorder_hoc(new_path[:-4] + '.hoc')
