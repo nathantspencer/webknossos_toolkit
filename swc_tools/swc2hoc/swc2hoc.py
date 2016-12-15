@@ -266,9 +266,13 @@ def true_root(swc_path):
 	return 0
 
 # centers the swc around (0, 0, 0) in 3d space
-def subtract_means(swc_path, data):
+def subtract_means(swc_path, soma_path, data, soma_data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
+	f.close()
+
+	f = open(soma_path, 'r')
+	soma_lines = f.readlines()
 	f.close()
 
 	x_sum = 0
@@ -282,9 +286,15 @@ def subtract_means(swc_path, data):
 		y_sum = y_sum + line['y']
 		z_sum = z_sum + line['z']
 
-	x_mean = x_sum / len(swc_lines)
-	y_mean = y_sum / len(swc_lines)
-	z_mean = z_sum / len (swc_lines)
+	for cur_id in range(len(soma_lines)):
+		line = soma_data[cur_id]
+		x_sum = x_sum + line['x']
+		y_sum = y_sum + line['y']
+		z_sum = z_sum + line['z']
+
+	x_mean = x_sum / (len(swc_lines) + len(soma_lines))
+	y_mean = y_sum / (len(swc_lines) + len(soma_lines))
+	z_mean = z_sum / (len (swc_lines) + len(soma_lines))
 
 	# make another pass to subtract means
 	for cur_id in range(len(swc_lines)):
@@ -292,8 +302,14 @@ def subtract_means(swc_path, data):
 		line['x'] = line['x'] - x_mean
 		line['y'] = line['y'] - y_mean
 		line['z'] = line['z'] - z_mean
+	for cur_id in range(len(soma_lines)):
+		line = soma_data[cur_id]
+		line['x'] = line['x'] - x_mean
+		line['y'] = line['y'] - y_mean
+		line['z'] = line['z'] - z_mean
 
 	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
+	np.savetxt(soma_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 # reorders hoc sections by the parent they belong to
 def reorder_hoc(hoc_path, soma_size):
@@ -354,14 +370,16 @@ def main():
 		soma_path = sys.argv[2]
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
 		data = np.loadtxt(swc_path, dtype=dtype)
+		soma_data = np.loadtxt(soma_path, dtype=dtype)
 
 		f = open(soma_path, 'r')
 		linus = f.readlines()
 		soma_size = len(linus)
 
 		# subtract means
-		subtract_means(swc_path, data)
+		subtract_means(swc_path, soma_path, data, soma_data)
 		new_path = swc_path[:-4] + '_centered.swc'
+		new_soma_path = soma_path[:-4] + '_centered.swc'
 
 		# correct order
 		correct(new_path)
@@ -380,7 +398,7 @@ def main():
 		new_path = new_path[:-4] + '_reparent.swc'
 
 		# make hoc code
-		write_hoc(new_path, soma_path, data)
+		write_hoc(new_path, new_soma_path, data)
 
 		# reorder
 		reorder_hoc(new_path[:-4] + '.hoc', soma_size)
@@ -390,6 +408,7 @@ def main():
 		comment(new_path[:-4] + '.hoc', soma_size)
 
 		# delete temporary intermediate files
+		os.remove(new_soma_path)
 		os.remove(swc_path[:-4] + '_centered.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
