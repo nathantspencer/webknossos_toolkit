@@ -52,9 +52,9 @@ The python script `swc_center.py` takes as an argument the path to an `swc` file
 **EX:** `$ python swc_center 'path\to\swc\file.swc'`
 
 ## swc2hoc
-The python script `swc2hoc.py` takes as an argument the path to an `.swc` file. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. A usage example is given below.
+The python script `swc2hoc.py` takes as an argument the path to an `.swc` file representing a dendrite and an `.swc` file representing a soma. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. A usage example is given below.
 
-**EX:** `$ python swc2hoc.py 'path\to\swc\file.swc'`
+**EX:** `$ python swc2hoc.py ['dendriteSkeleton.swc'] ['somaSkeleton.swc']`
 
 The commented version of the `.hoc` will include comments according to the branch number for each branch order. For example, a section labeled `// d1` is the first branch. A section labeled `// d1,2` is the second of the branches descending from the first branch. A section labeled `// d2,1,3` is the third branch descending from the first branch descending from the second branch.
 
