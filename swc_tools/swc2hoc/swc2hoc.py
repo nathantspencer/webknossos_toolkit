@@ -413,6 +413,8 @@ def main():
 		os.remove(swc_path[:-4] + '_centered_corrected.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered.hoc', swc_path[:-4] + '.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_commented.hoc', swc_path[:-4] + '_commented.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds.\n")
