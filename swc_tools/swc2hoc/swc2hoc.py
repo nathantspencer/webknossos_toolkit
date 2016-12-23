@@ -240,21 +240,17 @@ def write_hoc(swc_path, soma_path, data):
 		# Starting from start_node, traverse and write points
 		current_node = start_node
 		if secs[i][0] == 1:
-			radius = float(swc_lines[0].split()[5])
-			diameter = radius * 2
 			f.write('  pt3dadd(')
 			f.write(swc_lines[0].split()[2] + ', ')
 			f.write(swc_lines[0].split()[3] + ', ')
 			f.write(swc_lines[0].split()[4] + ', ')
-			f.write(str(diameter) + ')\n')
+			f.write(swc_lines[0].split()[5] + ')\n')
 		while(current_node != -1):
-			radius = float(swc_lines[current_node - 1].split()[5])
-			diameter = radius * 2
 			f.write('  pt3dadd(')
 			f.write(swc_lines[current_node - 1].split()[2] + ', ')
 			f.write(swc_lines[current_node - 1].split()[3] + ', ')
 			f.write(swc_lines[current_node - 1].split()[4] + ', ')
-			f.write(str(diameter) + ')\n')
+			f.write(swc_lines[current_node - 1].split()[5] + ')\n')
 			current_node = int(parent_to_child[str(current_node)])
 		f.write('}\n\n')
 	f.close()
@@ -288,19 +284,50 @@ def true_root(swc_path):
 	return 0
 
 # centers the swc around (0, 0, 0) in 3d space
-def subtract_means(swc_path, data):
+def subtract_means(swc_path, soma_path, data, soma_data):
 	f = open(swc_path, 'r')
 	swc_lines = f.readlines()
 	f.close()
 
+	f = open(soma_path, 'r')
+	soma_lines = f.readlines()
+	f.close()
+
+	x_sum = 0
+	y_sum = 0
+	z_sum = 0
+
+	# sum values of x, y, z to calculate mean
+	for cur_id in range(len(swc_lines)):
+		line = data[cur_id]
+		x_sum = x_sum + line['x']
+		y_sum = y_sum + line['y']
+		z_sum = z_sum + line['z']
+
+	for cur_id in range(len(soma_lines)):
+		line = soma_data[cur_id]
+		x_sum = x_sum + line['x']
+		y_sum = y_sum + line['y']
+		z_sum = z_sum + line['z']
+
+	x_mean = x_sum / (len(swc_lines) + len(soma_lines))
+	y_mean = y_sum / (len(swc_lines) + len(soma_lines))
+	z_mean = z_sum / (len (swc_lines) + len(soma_lines))
+
 	# make another pass to subtract means
 	for cur_id in range(len(swc_lines)):
 		line = data[cur_id]
-		line['x'] = line['x'] - 3105.36649786
-		line['y'] = line['y'] - 8538.12548339
-		line['z'] = line['z'] - 5963.909258
+		line['x'] = line['x'] - x_mean
+		line['y'] = line['y'] - y_mean
+		line['z'] = line['z'] - z_mean
+	for cur_id in range(len(soma_lines)):
+		line = soma_data[cur_id]
+		line['x'] = line['x'] - x_mean
+		line['y'] = line['y'] - y_mean
+		line['z'] = line['z'] - z_mean
 
 	np.savetxt(swc_path[:-4] + '_centered.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
+	np.savetxt(soma_path[:-4] + '_centered.swc', soma_data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 # reorders hoc sections by the parent they belong to
 def reorder_hoc(hoc_path, soma_size):
@@ -352,17 +379,63 @@ def reorder_hoc(hoc_path, soma_size):
 
 def main():
 	# argument check
-	if len(sys.argv) != 2:
+	if len(sys.argv) != 3:
 		print('\nSWC2HOC.PY 2016');
 		print('Usage: $ python swc2hoc.py [dendriteSkeleton.swc] [somaSkeleton.swc]')
 	else:
 		start = time.time()
 		swc_path = sys.argv[1]
+		soma_path = sys.argv[2]
 		dtype = [('id', int), ('type', int), ('x', float), ('y', float), ('z', float), ('r', float), ('parent', int)]
 		data = np.loadtxt(swc_path, dtype=dtype)
+		soma_data = np.loadtxt(soma_path, dtype=dtype)
+
+		f = open(soma_path, 'r')
+		linus = f.readlines()
+		soma_size = len(linus)
 
 		# subtract means
-		subtract_means(swc_path, data)
+		subtract_means(swc_path, soma_path, data, soma_data)
+		new_path = swc_path[:-4] + '_centered.swc'
+		new_soma_path = soma_path[:-4] + '_centered.swc'
+
+		# correct order
+		correct(new_path)
+		new_path = new_path[:-4] + '_corrected.swc'
+
+		# determine true root
+		reparent_root = true_root(new_path)
+		if(reparent_root == 0):
+			print('\nWARNING: The root of your dendrite must have type soma (1). This might go poorly.\n')
+		else:
+			print('\nTrue root found at index ' + str(reparent_root) + '!')
+
+		# reparent
+		data = np.loadtxt(new_path, dtype=dtype)
+		reparent(new_path, data, reparent_root)
+		new_path = new_path[:-4] + '_reparent.swc'
+
+		# make sure things look kosher with the swc file
+		validate(new_path)
+
+		# make hoc code
+		write_hoc(new_path, new_soma_path, data)
+
+		# reorder
+		reorder_hoc(new_path[:-4] + '.hoc', soma_size)
+		new_path = new_path[:-4]  + '_reordered.hoc'
+
+		# comment
+		comment(new_path[:-4] + '.hoc', soma_size)
+
+		# delete temporary intermediate files
+		os.remove(new_soma_path)
+		os.remove(swc_path[:-4] + '_centered.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
+		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered.hoc', swc_path[:-4] + '.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_commented.hoc', swc_path[:-4] + '_commented.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds.\n")
