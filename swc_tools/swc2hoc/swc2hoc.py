@@ -240,17 +240,21 @@ def write_hoc(swc_path, soma_path, data):
 		# Starting from start_node, traverse and write points
 		current_node = start_node
 		if secs[i][0] == 1:
+			radius = float(swc_lines[0].split()[5])
+			diameter = radius * 2
 			f.write('  pt3dadd(')
 			f.write(swc_lines[0].split()[2] + ', ')
 			f.write(swc_lines[0].split()[3] + ', ')
 			f.write(swc_lines[0].split()[4] + ', ')
-			f.write(swc_lines[0].split()[5] + ')\n')
+			f.write(str(diameter) + ')\n')
 		while(current_node != -1):
+			radius = float(swc_lines[current_node - 1].split()[5])
+			diameter = radius * 2
 			f.write('  pt3dadd(')
 			f.write(swc_lines[current_node - 1].split()[2] + ', ')
 			f.write(swc_lines[current_node - 1].split()[3] + ', ')
 			f.write(swc_lines[current_node - 1].split()[4] + ', ')
-			f.write(swc_lines[current_node - 1].split()[5] + ')\n')
+			f.write(str(diameter) + ')\n')
 			current_node = int(parent_to_child[str(current_node)])
 		f.write('}\n\n')
 	f.close()
