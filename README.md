@@ -14,7 +14,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
 
-### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
+### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#hoc_tools-1)
 * [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
 
 ### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools-1)
