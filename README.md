@@ -1,10 +1,10 @@
 # **webknossos_toolkit**
 
-You might know `.nml` files from your favorite online skeletonizing application: webKnossos. You might have pockets full of `.zip` files of raw image data from your tracings. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` and `.zip` files directly from webKnossos, as well as file types like `.swc` that can be created from webKnossos files.
+You might know `.nml` files from your favorite online skeletonizing application: webKnossos. You might have pockets full of `.zip` files of raw image data from your tracings. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` and `.zip` files directly from webKnossos, as well as file types like `.swc` and `.hoc` that can be created from webKnossos files.
 
 # **table of contents**
 
-#### [nml_tools](https://github.com/nathantspencer/webknossos_toolkit#nml_tools-1)
+### [nml_tools](https://github.com/nathantspencer/webknossos_toolkit#nml_tools-1)
 * [nml_merger](https://github.com/nathantspencer/webknossos_toolkit#nml_merger)
 * [nml_splitter](https://github.com/nathantspencer/webknossos_toolkit#nml_splitter)
 * [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
@@ -14,7 +14,10 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
 
-#### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools-1)
+### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
+* [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
+
+### [zip_tools](https://github.com/nathantspencer/webknossos_toolkit#zip_tools-1)
 * [zip_splitter](https://github.com/nathantspencer/webknossos_toolkit#zip_splitter)
 
 
@@ -54,7 +57,7 @@ The python script `swc_center.py` takes as an argument the path to an `swc` file
 ## swc2hoc
 The python script `swc2hoc.py` takes as an argument the path to an `.swc` file representing a dendrite and an `.swc` file representing a soma. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. A usage example is given below.
 
-**EX:** `$ python swc2hoc.py ['dendriteSkeleton.swc'] ['somaSkeleton.swc']`
+**EX:** `$ python swc2hoc.py 'dendriteSkeleton.swc' 'somaSkeleton.swc'`
 
 The commented version of the `.hoc` will include comments according to the branch number for each branch order. For example, a section labeled `// d1` is the first branch. A section labeled `// d1,2` is the second of the branches descending from the first branch. A section labeled `// d2,1,3` is the third branch descending from the first branch descending from the second branch.
 
@@ -66,6 +69,15 @@ The python script `swc2obj.py` will convert a given `.swc` into a point cloud `.
 **EX:** `$ python swc2obj.py 'path\to\swc\directory'`
 
 Following the command given in the first example, `file.obj` will be created in the same directory as the input file. In the second example, `.obj`s will be created in `\directory`.
+
+# **hoc_tools**
+
+## hoc_scaler
+The python script `hoc_scaler.py` can be used to apply scale factors to the x, y, and z coordinates of a `.hoc` file as well as to the diameter of a node. It takes five arguments: the path to the `.hoc` file, the x scale factor, the y scale factor, the z scale factor, and the diameter scale factor, respectively. A usage example is shown below. 
+
+**EX:** `$ python hoc_scaler.py 'path\to\hoc\file.hoc' 1.5 1.5 1.5 0.015`
+
+Once the script has finished executing, a `.hoc` file with `_scaled` appended to the original name will be created in the same directory as the input file.
 
 # **zip_tools**
 
