@@ -13,6 +13,8 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [swc_center](https://github.com/nathantspencer/webknossos_toolkit#swc_center)
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
+* [swc_components](https://github.com/nathantspencer/webknossos_toolkit#swc_components)
+* [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
 
 ### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#hoc_tools-1)
 * [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
@@ -69,6 +71,21 @@ The python script `swc2obj.py` will convert a given `.swc` into a point cloud `.
 **EX:** `$ python swc2obj.py 'path\to\swc\directory'`
 
 Following the command given in the first example, `file.obj` will be created in the same directory as the input file. In the second example, `.obj`s will be created in `\directory`.
+
+## swc_components
+The script `swc_components.py` takes an `.swc` file containing multiple root nodes and changes the type associated with each connected component so that they can be seen in different colors when visualized with an `swc` viewer such as [Shark Viewer](https://github.com/JaneliaSciComp/SharkViewer). If there is a loop in the `swc` (a connected component which has no root node), it will not be included in the resulting file.
+
+**EX:** `$ python swc_components.py 'path\to\swc\file.swc'`
+
+A file with the original name along with the suffix `_components` appended will be created in the source directory.
+
+
+## swc_corrector
+The python script `swc_corrector.py` takes an `.swc` file as an argument and provides a copy of that file such that the indices of each node are presented as consecutive natural numbers. A usage example is shown below.
+
+**EX:** `$ python swc_corrector.py 'path\to\swc\file.swc'`
+
+Following execution of the script, a file will be created in the same directory as the original `.swc` and will have the same name with `_corrected` appended. This file should represent the same graphical structure, changing only the indices associated with each node.
 
 # **hoc_tools**
 
