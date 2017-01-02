@@ -15,6 +15,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
 * [swc_components](https://github.com/nathantspencer/webknossos_toolkit#swc_components)
 * [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
+* [swc_cyclebreaker](https://github.com/nathantspencer/webknossos_toolkit#swc_cyclebreaker)
 
 ### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#hoc_tools-1)
 * [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
@@ -86,6 +87,13 @@ The python script `swc_corrector.py` takes an `.swc` file as an argument and pro
 **EX:** `$ python swc_corrector.py 'path\to\swc\file.swc'`
 
 Following execution of the script, a file will be created in the same directory as the original `.swc` and will have the same name with `_corrected` appended. This file should represent the same graphical structure, changing only the indices associated with each node.
+
+## swc_cyclebreaker
+The python script `swc_cyclebreaker.py` takes an `.swc` file without any root node (i.e. a graph with only one connected component which contains a loop). The node that should be made the root node should be indicated by setting its type to 1. An adjacency list will be created for the graph, from which a new graph will be drawn using the indicated node as the new root. The cycle in the graph will be eliminated. A usage example is given below.
+
+**EX:** `$ python swc_cyclebreaker.py 'path\to\swc\file.swc'`
+
+The redrawn `.swc` will be saved alongside the source file with the suffix `_cyclebroken` appended to its name. 
 
 # **hoc_tools**
 
