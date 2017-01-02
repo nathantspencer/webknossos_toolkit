@@ -16,6 +16,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [swc_components](https://github.com/nathantspencer/webknossos_toolkit#swc_components)
 * [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
 * [swc_cyclebreaker](https://github.com/nathantspencer/webknossos_toolkit#swc_cyclebreaker)
+* [swc_smoother](https://github.com/nathantspencer/webknossos_toolkit#swc_smoother)
 
 ### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#hoc_tools-1)
 * [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
@@ -80,7 +81,6 @@ The script `swc_components.py` takes an `.swc` file containing multiple root nod
 
 A file with the original name along with the suffix `_components` appended will be created in the source directory.
 
-
 ## swc_corrector
 The python script `swc_corrector.py` takes an `.swc` file as an argument and provides a copy of that file such that the indices of each node are presented as consecutive natural numbers. A usage example is shown below.
 
@@ -94,6 +94,13 @@ The python script `swc_cyclebreaker.py` takes an `.swc` file without any root no
 **EX:** `$ python swc_cyclebreaker.py 'path\to\swc\file.swc'`
 
 The redrawn `.swc` will be saved alongside the source file with the suffix `_cyclebroken` appended to its name. 
+
+## swc_smoother
+The script `swc_smoother.py` is a work in progress and may not terminate properly for some values of allowable change per node. Give the path to an `swc` file and a float maximum allowable change per node, the script will smooth over abrupt changes in radius from node to node, capping the maximum change between two nodes such that radius changes are smoother and less jumpy.
+
+**EX:** `$ python swc+smoother 'path\to\swc\file.swc' 1.1`
+
+In this example, the radius change between two nodes will be restricted to be no more than 10%. The resulting "smoothed" `swc` will be saved alongside the source file with the suffix `_smooth` appended to its name.
 
 # **hoc_tools**
 
