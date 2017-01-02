@@ -405,19 +405,30 @@ def main():
 
 		# correct order
 		correct(new_path)
+		correct(new_soma_path)
 		new_path = new_path[:-4] + '_corrected.swc'
+		new_soma_path = new_soma_path[:-4] + '_corrected.swc'
 
 		# determine true root
 		reparent_root = true_root(new_path)
+		soma_reparent_root = true_root(new_soma_path)s
 		if(reparent_root == 0):
 			print('\nWARNING: The root of your dendrite must have type soma (1). This might go poorly.\n')
 		else:
-			print('\nTrue root found at index ' + str(reparent_root) + '!')
+			print('\nDendrite true root found at index ' + str(reparent_root) + '!')
+		if(soma_reparent_root == 0):
+			print('\nWARNING: The root of your soma must have type soma (1). This might go poorly.\n')
+		else:
+			print('\nSoma true root found at index ' + str(soma_reparent_root) + '!')
 
 		# reparent
 		data = np.loadtxt(new_path, dtype=dtype)
 		reparent(new_path, data, reparent_root)
 		new_path = new_path[:-4] + '_reparent.swc'
+
+		soma_data = np.loadtxt(new_path, dtype=dtype)
+		reparent(new_soma_path, soma_data, soma_reparent_root)
+		new_soma_path = new_soma_path[:-4] + '_reparent.swc'
 
 		# make sure things look kosher with the swc file
 		validate(new_path)
@@ -433,7 +444,9 @@ def main():
 		comment(new_path[:-4] + '.hoc', soma_size)
 
 		# delete temporary intermediate files
-		os.remove(new_soma_path)
+		os.remove(soma_path[:-4] + '_centered.swc')
+		os.remove(soma_path[:-4] + '_centered_corrected.swc')
+		os.remove(soma_path[:-4] + '_centered_corrected_reparent.swc')
 		os.remove(swc_path[:-4] + '_centered.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
