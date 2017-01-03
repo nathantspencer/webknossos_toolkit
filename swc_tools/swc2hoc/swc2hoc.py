@@ -175,6 +175,8 @@ def write_hoc(swc_path, soma_path, data):
 	for x in range(len(secs)):
 		parent_list.append(secs[x][1])
 
+	f.close()
+
 	f = open(soma_path, 'r')
 	soma_lines = f.readlines()
 	f.close()
@@ -199,7 +201,10 @@ def write_hoc(swc_path, soma_path, data):
 
 	# All following sections are assumed to be dendrite sections
 	for i in range(1, len(secs)):
-		parent = parent_list.index(secs[i][0])
+		if secs[i][0] == 1:
+			parent = 0
+		else:
+			parent = parent_list.index(secs[i][0])
 		f.write('access sections[' + str(i) + ']\n')
 		f.write('dendrite.append()\n')
 		f.write('connect sections[' + str(i) + '](0), sections[' + str(parent) + '](1)\n')
@@ -411,7 +416,7 @@ def main():
 
 		# determine true root
 		reparent_root = true_root(new_path)
-		soma_reparent_root = true_root(new_soma_path)s
+		soma_reparent_root = true_root(new_soma_path)
 		if(reparent_root == 0):
 			print('\nWARNING: The root of your dendrite must have type soma (1). This might go poorly.\n')
 		else:
@@ -426,7 +431,7 @@ def main():
 		reparent(new_path, data, reparent_root)
 		new_path = new_path[:-4] + '_reparent.swc'
 
-		soma_data = np.loadtxt(new_path, dtype=dtype)
+		soma_data = np.loadtxt(new_soma_path, dtype=dtype)
 		reparent(new_soma_path, soma_data, soma_reparent_root)
 		new_soma_path = new_soma_path[:-4] + '_reparent.swc'
 
