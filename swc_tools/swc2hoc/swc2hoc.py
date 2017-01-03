@@ -196,7 +196,7 @@ def write_hoc(swc_path, soma_path, data):
 		f.write(line.strip().split()[2] + ', ')
 		f.write(line.strip().split()[3] + ', ')
 		f.write(line.strip().split()[4] + ', ')
-		f.write(line.strip().split()[5] + ')\n')
+		f.write(str(int(line.strip().split()[5])*2) + ')\n')
 	f.write('}\n\n')
 
 	# All following sections are assumed to be dendrite sections
@@ -446,7 +446,7 @@ def main():
 		new_path = new_path[:-4]  + '_reordered.hoc'
 
 		# comment
-		comment(new_path[:-4] + '.hoc', soma_size)
+		comment(new_path[:-4] + '_saved.hoc', soma_size)
 
 		# delete temporary intermediate files
 		os.remove(soma_path[:-4] + '_centered.swc')
@@ -456,8 +456,8 @@ def main():
 		os.remove(swc_path[:-4] + '_centered_corrected.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
-		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered.hoc', swc_path[:-4] + '.hoc')
-		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_commented.hoc', swc_path[:-4] + '_commented.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_saved.hoc', swc_path[:-4] + '.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_saved_commented.hoc', swc_path[:-4] + '_commented.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds.\n")
