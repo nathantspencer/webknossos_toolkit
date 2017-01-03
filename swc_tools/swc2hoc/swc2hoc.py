@@ -323,6 +323,10 @@ def subtract_means(swc_path, soma_path, data, soma_data):
 	y_mean = y_sum / (len(swc_lines) + len(soma_lines))
 	z_mean = z_sum / (len (swc_lines) + len(soma_lines))
 
+	print("X MEAN: " + x_mean)
+	print("Y MEAN: " + y_mean)
+	print("Z MEAN: " + z_mean)
+
 	# make another pass to subtract means
 	for cur_id in range(len(swc_lines)):
 		line = data[cur_id]
