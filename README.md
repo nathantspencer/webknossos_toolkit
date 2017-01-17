@@ -12,6 +12,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 ### [swc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
+* [swc2pt3dadd](https://github.com/nathantspencer/webknossos_toolkit#swc2pt3dadd)
 * [swc_center](https://github.com/nathantspencer/webknossos_toolkit#swc_center)
 * [swc_components](https://github.com/nathantspencer/webknossos_toolkit#swc_components)
 * [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
@@ -68,6 +69,11 @@ The python script `swc2obj.py` will convert a given `.swc` into a point cloud `.
 **EX:** `$ python swc2obj.py 'path\to\swc\directory'`
 
 Following the command given in the first example, `file.obj` will be created in the same directory as the input file. In the second example, `.obj`s will be created in `\directory`.
+
+## swc2pt3dadd
+The python script `swc2pt3dadd.py` will convert each node of a given `.swc` file into a 3d point which can then be pasted into a `.hoc` file. The script takes a path to the `.swc` file as an argument. The resulting file is not actually valid `.hoc` but rather a series of commands that can be used in a `.hoc` file. For this reason, the output file is saved as a `.txt` file alongside the input file with the suffix `_pt3dadd` appended to the original name. A usage example is shown below.
+
+**EX:** `$ python swc2pt3dadd.py 'path\to\swc\file.swc'`
 
 ## swc_center
 The python script `swc_center.py` takes as an argument the path to an `swc` file. An `.swc` will be created in the same directory as the target file, with `_centered` appended to the original file name. The new swc will be centered around (0, 0, 0). Note that this will result in negative coordinates. A usage example is shown below:
