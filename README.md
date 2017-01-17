@@ -10,13 +10,14 @@ You might know `.nml` files from your favorite online skeletonizing application:
 * [nml2swc](https://github.com/nathantspencer/webknossos_toolkit#nml2swc)
 
 ### [swc_tools](https://github.com/nathantspencer/webknossos_toolkit#swc_tools-1)
-* [swc_center](https://github.com/nathantspencer/webknossos_toolkit#swc_center)
 * [swc2hoc](https://github.com/nathantspencer/webknossos_toolkit#swc2hoc)
 * [swc2obj](https://github.com/nathantspencer/webknossos_toolkit#swc2obj)
+* [swc_center](https://github.com/nathantspencer/webknossos_toolkit#swc_center)
 * [swc_components](https://github.com/nathantspencer/webknossos_toolkit#swc_components)
 * [swc_corrector](https://github.com/nathantspencer/webknossos_toolkit#swc_corrector)
 * [swc_cyclebreaker](https://github.com/nathantspencer/webknossos_toolkit#swc_cyclebreaker)
 * [swc_smoother](https://github.com/nathantspencer/webknossos_toolkit#swc_smoother)
+* [swc_offset](https://github.com/nathantspencer/webknossos_toolkit#swc_offset)
 
 ### [hoc_tools](https://github.com/nathantspencer/webknossos_toolkit#hoc_tools-1)
 * [hoc_scaler](https://github.com/nathantspencer/webknossos_toolkit#hoc_scaler)
@@ -41,7 +42,6 @@ The python script `nml_splitter.py` takes an `.nml` file or a directory containi
 
 **EX:** `$ python nml_splitter.py 'path\to\nml\directory'`
 
-
 ## nml2swc
 The python script `nml2swc.py` can be used to convert all `.nml` files in a directory into `.swc` files with a given radius. The script takes one or two arguments: the full path to the file or directory containing your `.nml`s, and the optional integer radius you'd like to assign to each node of the resulting `.swc`s. If the second argument is left out, radii for each node of the skeleton will be taken from the input `.nml`. Usage examples are shown below.
 
@@ -52,11 +52,6 @@ The python script `nml2swc.py` can be used to convert all `.nml` files in a dire
 Note that in the second usage example, the radius for each node will be taken from the `.nml` file given as the first argument because no second argument was given.
 
 # **swc_tools**
-
-## swc_center
-The python script `swc_center.py` takes as an argument the path to an `swc` file. An `.swc` will be created in the same directory as the target file, with `_centered` appended to the original file name. The new swc will be centered around (0, 0, 0). Note that this will result in negative coordinates. A usage example is shown below:
-
-**EX:** `$ python swc_center 'path\to\swc\file.swc'`
 
 ## swc2hoc
 The python script `swc2hoc.py` takes as an argument the path to an `.swc` file representing a dendrite and an `.swc` file representing a soma. A `.hoc` file will be created in the same directory as the `.swc` file along with a commented version with `_commented` appended to its name. A usage example is given below.
@@ -73,6 +68,11 @@ The python script `swc2obj.py` will convert a given `.swc` into a point cloud `.
 **EX:** `$ python swc2obj.py 'path\to\swc\directory'`
 
 Following the command given in the first example, `file.obj` will be created in the same directory as the input file. In the second example, `.obj`s will be created in `\directory`.
+
+## swc_center
+The python script `swc_center.py` takes as an argument the path to an `swc` file. An `.swc` will be created in the same directory as the target file, with `_centered` appended to the original file name. The new swc will be centered around (0, 0, 0). Note that this will result in negative coordinates. A usage example is shown below:
+
+**EX:** `$ python swc_center 'path\to\swc\file.swc'`
 
 ## swc_components
 The script `swc_components.py` takes an `.swc` file containing multiple root nodes and changes the type associated with each connected component so that they can be seen in different colors when visualized with an `swc` viewer such as [Shark Viewer](https://github.com/JaneliaSciComp/SharkViewer). If there is a loop in the `swc` (a connected component which has no root node), it will not be included in the resulting file.
@@ -98,9 +98,14 @@ The redrawn `.swc` will be saved alongside the source file with the suffix `_cyc
 ## swc_smoother
 The script `swc_smoother.py` is a work in progress and may not terminate properly for some values of allowable change per node. Give the path to an `swc` file and a float maximum allowable change per node, the script will smooth over abrupt changes in radius from node to node, capping the maximum change between two nodes such that radius changes are smoother and less jumpy.
 
-**EX:** `$ python swc+smoother 'path\to\swc\file.swc' 1.1`
+**EX:** `$ python swc_smoother 'path\to\swc\file.swc' 1.1`
 
 In this example, the radius change between two nodes will be restricted to be no more than 10%. The resulting "smoothed" `swc` will be saved alongside the source file with the suffix `_smooth` appended to its name.
+
+## swc_offset
+The script `swc_offset.py` takes as arguments the path to an `.swc` file and three `float` offsets for the x-coordinate, y-coordinate, and z-coordinate respectively. These offsets are added to the original coordinates. They may be negative. The resulting offset `.swc` is saved alongside the input file with the suffix `_offset` appended to the name. A usage example is given below:
+
+**EX:** `$ python swc_offset 'path\to\swc\file.swc' 150.25 23.4 -87.64`
 
 # **hoc_tools**
 
