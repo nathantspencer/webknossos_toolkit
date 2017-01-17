@@ -29,7 +29,7 @@ def pt3dadd(swc_path):
         line_to_write = '  pt3dadd(' + x + ', ' + y + ', ' + z + ', ' + radius + ')\n'
         lines_to_write.append(line_to_write)
 
-    f = open(swc_path[:-4] + '_pt3dadd.swc', 'w')
+    f = open(swc_path[:-4] + '_pt3dadd.txt', 'w')
     for line in lines_to_write:
         f.write(line)
     f.close()
