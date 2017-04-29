@@ -91,8 +91,8 @@ def write_swc(nmls_path, radius=0):
             n += 1
             if node_id in child_list:
                 node_parent = child_parent[child_list.index(node_id)][1]
-	    else:
-	        node_parent = -1
+            else:
+                node_parent = -1
 
         f = open(swc, 'w')
         for line in lines_to_write:
