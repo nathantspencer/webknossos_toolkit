@@ -4,7 +4,6 @@ import sys
 import defusedxml.ElementTree as ET
 
 def write_swc(nmls_path, radius=0):
-    nmls_path = sys.argv[1]
     node_radius = radius
 
     # store paths to nmls
@@ -72,16 +71,12 @@ def write_swc(nmls_path, radius=0):
             n += 1
 
         for line in lines:
-            new_child = index_map[line.split(' ')[0]]
-            line = line[len(line.split(' ')[0]):]
-            line = str(new_child) + line
+            line = str(index_map[line.split(' ')[0]]) + line[len(line.split(' ')[0]):]
             lines_to_write.append(line)
 
         n = 0
         for line in lines_to_write:
-            new_parent = index_map[(line.split(' ')[6])[:-1]]
-            line = line[:-len(line.split(' ')[6])]
-            line = line + str(new_parent)
+            line = line[:-len(line.split(' ')[6])] + str(index_map[(line.split(' ')[6])[:-1]])
             lines_to_write[n] = line
             n += 1
             if node_id in child_list:
