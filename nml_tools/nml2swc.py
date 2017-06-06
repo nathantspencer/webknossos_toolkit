@@ -60,35 +60,38 @@ def write_swc(nmls_path, radius=0):
     # correct indexing: enforce consecutive natural numbering
     print('Writing final .swc files...')
     for swc in swcs:
-        lines_to_write = []
-        index_map = {'-1':-1}
-        f = open(swc, 'r')
-        lines = f.readlines()
-        f.close()
-        n = 1
-        for line in lines:
-            index_map[line.split(' ')[0]] = n
-            n += 1
-
-        for line in lines:
-            line = str(index_map[line.split(' ')[0]]) + line[len(line.split(' ')[0]):]
-            lines_to_write.append(line)
-
-        n = 0
-        for line in lines_to_write:
-            line = line[:-len(line.split(' ')[6])] + str(index_map[(line.split(' ')[6])[:-1]])
-            lines_to_write[n] = line
-            n += 1
-            if node_id in child_list:
-                node_parent = child_parent[child_list.index(node_id)][1]
-            else:
-                node_parent = -1
-
+        lines_to_write = correct(swc, child_list, child_parent, node_id)
         f = open(swc, 'w')
         for line in lines_to_write:
             f.write(line + '\n')
         f.close()
         print(swc)
+
+def correct(swc, child_list, child_parent, node_id):
+    lines_to_write = []
+    index_map = {'-1':-1}
+    f = open(swc, 'r')
+    lines = f.readlines()
+    f.close()
+    n = 1
+    for line in lines:
+        index_map[line.split(' ')[0]] = n
+        n += 1
+
+    for line in lines:
+        line = str(index_map[line.split(' ')[0]]) + line[len(line.split(' ')[0]):]
+        lines_to_write.append(line)
+
+    n = 0
+    for line in lines_to_write:
+        line = line[:-len(line.split(' ')[6])] + str(index_map[(line.split(' ')[6])[:-1]])
+        lines_to_write[n] = line
+        n += 1
+        if node_id in child_list:
+            node_parent = child_parent[child_list.index(node_id)][1]
+        else:
+            node_parent = -1
+    return lines_to_write
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
