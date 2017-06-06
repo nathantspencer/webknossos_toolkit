@@ -1,7 +1,7 @@
 import glob
 import os
 import sys
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 
 def write_swc(nmls_path, radius=0):
     nmls_path = sys.argv[1]
