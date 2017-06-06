@@ -33,53 +33,8 @@ def merge_nml(skeleton_folder, file_to_write):
                 SubElement(parameters, 'experiment', {'name ': doc['things']['parameters']['experiment']['@name']})
             print filename
 
-            thing = SubElement(things, 'thing', {'id': str(thingCount),
-                                                 'color.r': doc['things']['thing']['@color.r'],
-                                                 'color.g': doc['things']['thing']['@color.g'],
-                                                 'color.b': doc['things']['thing']['@color.b'],
-                                                 'color.a': doc['things']['thing']['@color.a'],
-                                                 'name': 'Tree' + str(thingCount)})
-
-            nodes = SubElement(thing, 'nodes')
-            lastNodeCount = nodeCount
-
-            for node in doc['things']['thing']['nodes']['node']:
-
-                translateX = 0
-                translateY = 0
-
-                if node.get('@rotX') == None:
-                    node['@rotX'] = '0'
-                    node['@rotY'] = '0'
-                    node['@rotZ'] = '0'
-                    node['@inMag'] = '0'
-                    node['@bitDepth'] = '8'
-                    node['@interpolation'] = 'false'
-
-                    translateX = int(math.floor(float(doc['things']['parameters']['skeletonVPState'].get('@translateX'))))
-                    translateY = int(math.floor(float(doc['things']['parameters']['skeletonVPState'].get('@translateY'))))
-
-                node = SubElement(nodes, 'node', {'id': str(int(node['@id']) + lastNodeCount),
-                                                  'radius': node['@radius'],
-                                                  'x': str(int(node['@x']) - translateX + translateX),
-                                                  'y': str(int(node['@y']) - translateY + translateY),
-                                                  'z': node['@z'],
-                                                  'rotX': node['@rotX'],
-                                                  'rotY': node['@rotY'],
-                                                  'rotZ': node['@rotZ'],
-                                                  'inVp': node['@inVp'],
-                                                  'inMag': node['@inMag'],
-                                                  'bitDepth': node['@bitDepth'],
-                                                  'interpolation': node['@interpolation'],
-                                                  'time': node['@time']})
-
-                nodeCount = int(node.attrib['id']) + lastNodeCount
-
-            edges = SubElement(thing, 'edges')
-            for edge in doc['things']['thing']['edges']['edge']:
-                edge = SubElement(edges, 'edge', {'source': (str(int(edge['@source']) + lastNodeCount)),
-                                                  'target': (str(int(edge['@target']) + lastNodeCount))})
-
+            nodeCount = buildTree(doc, things, thingCount, nodeCount)
+            
        except KeyError, e:
         print '\nERROR -- File ' + filename + ' is malformed or empty, try redownloading it.\nKeyError: ' + str(e) + '\n'
 
@@ -89,6 +44,57 @@ def merge_nml(skeleton_folder, file_to_write):
     f = open(file_to_write, "w")
     f.write(etree.tostring(x, pretty_print=True))
     f.close()
+
+
+def buildTree(doc, things, thingCount, nodeCount):
+  thing = SubElement(things, 'thing', {'id': str(thingCount),
+    'color.r': doc['things']['thing']['@color.r'],
+    'color.g': doc['things']['thing']['@color.g'],
+    'color.b': doc['things']['thing']['@color.b'],
+    'color.a': doc['things']['thing']['@color.a'],
+    'name': 'Tree' + str(thingCount)})
+
+  nodes = SubElement(thing, 'nodes')
+  lastNodeCount = nodeCount
+
+  for node in doc['things']['thing']['nodes']['node']:
+
+      translateX = 0
+      translateY = 0
+
+      if node.get('@rotX') == None:
+          node['@rotX'] = '0'
+          node['@rotY'] = '0'
+          node['@rotZ'] = '0'
+          node['@inMag'] = '0'
+          node['@bitDepth'] = '8'
+          node['@interpolation'] = 'false'
+
+          translateX = int(math.floor(float(doc['things']['parameters']['skeletonVPState'].get('@translateX'))))
+          translateY = int(math.floor(float(doc['things']['parameters']['skeletonVPState'].get('@translateY'))))
+
+      node = SubElement(nodes, 'node', {'id': str(int(node['@id']) + lastNodeCount),
+                                        'radius': node['@radius'],
+                                        'x': str(int(node['@x']) - translateX + translateX),
+                                        'y': str(int(node['@y']) - translateY + translateY),
+                                        'z': node['@z'],
+                                        'rotX': node['@rotX'],
+                                        'rotY': node['@rotY'],
+                                        'rotZ': node['@rotZ'],
+                                        'inVp': node['@inVp'],
+                                        'inMag': node['@inMag'],
+                                        'bitDepth': node['@bitDepth'],
+                                        'interpolation': node['@interpolation'],
+                                        'time': node['@time']})
+
+      nodeCount = int(node.attrib['id']) + lastNodeCount
+
+  edges = SubElement(thing, 'edges')
+  for edge in doc['things']['thing']['edges']['edge']:
+      edge = SubElement(edges, 'edge', {'source': (str(int(edge['@source']) + lastNodeCount)),
+                                        'target': (str(int(edge['@target']) + lastNodeCount))})
+  return nodeCount
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
