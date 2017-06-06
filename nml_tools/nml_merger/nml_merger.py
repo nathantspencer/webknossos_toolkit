@@ -23,7 +23,6 @@ def merge_nml(skeleton_folder, file_to_write):
     thingCount = 0
     for ii, file in enumerate(files_to_merge):
         try:
-            hasComments = False
             hasBranchpoints = False
             thingCount += 1
 
@@ -36,26 +35,10 @@ def merge_nml(skeleton_folder, file_to_write):
                 scale = SubElement(parameters, 'scale', {'x': doc['things']['parameters']['scale']['@x'],
                                                          'y': doc['things']['parameters']['scale']['@y'],
                                                          'z': doc['things']['parameters']['scale']['@z']})
-                offset = SubElement(parameters, 'offset', {'x': doc['things']['parameters']['offset']['@x'],
-                                                           'y': doc['things']['parameters']['offset']['@y'],
-                                                           'z': doc['things']['parameters']['offset']['@z']})
                 time_ms = SubElement(parameters, 'time', {'ms': doc['things']['parameters']['time']['@ms']})
-                activeNode_id = SubElement(parameters, 'activeNode',
-                                           {'id': doc['things']['parameters']['activeNode']['@id']})
-                editPosition = SubElement(parameters, 'editPositioin',
-                                          {'x': doc['things']['parameters']['editPosition']['@x'],
-                                           'y': doc['things']['parameters']['editPosition']['@y'],
-                                           'z': doc['things']['parameters']['editPosition']['@z']})
-                zoomlevel_zoom = SubElement(parameters, 'zoomlevel',
-                                            {'zoom': doc['things']['parameters']['zoomLevel']['@zoom']})
             if 'branchpoint' in doc['things'].keys() and doc['things']['branchpoints'].keys():
                 hasBranchpoints = True
             print file
-
-            if not doc['things']['comments'] == None:
-                hasComments = True
-
-
 
             thing = SubElement(things, 'thing', {'id': str(thingCount),
                                                  'color.r': doc['things']['thing']['@color.r'],
@@ -67,8 +50,8 @@ def merge_nml(skeleton_folder, file_to_write):
             nodes = SubElement(thing, 'nodes')
             lastNodeCount = nodeCount
 
-            for jj, node in enumerate(doc['things']['thing']['nodes']['node']):
-
+            for node in doc['things']['thing']['nodes']['node']:
+              
                 translateX = 0
                 translateY = 0
 

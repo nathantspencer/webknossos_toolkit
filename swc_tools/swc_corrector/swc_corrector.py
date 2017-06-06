@@ -1,5 +1,4 @@
 import sys
-import code
 
 def correct(filePath):
 	lines_to_write = []

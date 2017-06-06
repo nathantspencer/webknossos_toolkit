@@ -1,11 +1,9 @@
 import numpy as np
 import sys
 import code
-import scipy.io as sio
 import re
 import os
 import time
-import warnings
 from operator import itemgetter
 
 def reparent(swc_path, data, id):

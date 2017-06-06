@@ -2,7 +2,6 @@ import matlab.engine
 import scipy.io as sio
 import sys
 import numpy
-import code
 
 def center(swc_path):
 

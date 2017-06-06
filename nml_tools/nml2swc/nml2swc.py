@@ -27,7 +27,6 @@ def write_swc(nmls_path, radius=0):
     for nml in nmls:
         nml_count += 1
         tree = ET.parse(nml)
-        things = tree.getroot()
         thing_list = tree.findall('thing')
         for thing in thing_list:
             nodes = thing.find('nodes')
