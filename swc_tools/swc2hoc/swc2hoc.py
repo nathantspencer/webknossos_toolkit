@@ -169,7 +169,7 @@ def write_hoc(swc_path, soma_path, data):
 	secs = sections(swc_path, data)
 	parent_list = []
 	for ii, _ in enumerate(secs):
-		parent_list.append(secs[x][1])
+		parent_list.append(secs[ii][1])
 
 	f.close()
 

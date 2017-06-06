@@ -31,8 +31,7 @@ def merge_nml(skeleton_folder, file_to_write):
             if ii == 0:
                 parameters = SubElement(things, 'parameters')
                 SubElement(parameters, 'experiment', {'name ': doc['things']['parameters']['experiment']['@name']})
-            if 'branchpoint' in doc['things'].keys() and doc['things']['branchpoints'].keys():
-                hasBranchpoints = True
+                
             print filename
 
             thing = SubElement(things, 'thing', {'id': str(thingCount),
