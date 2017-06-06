@@ -40,11 +40,7 @@ def write_swc(nmls_path, radius=0):
                 child_parent.append((child, parent))
 
             child_list = [pair[0] for pair in child_parent]
-            node_id = ''
-            node_x = ''
-            node_y = ''
-            node_z = ''
-            node_parent = ''
+            node_id, node_x, node_y, node_z, node_parent = ['']*5
 
             for node in nodes.findall('node'):
                 node_id = node.get('id')
