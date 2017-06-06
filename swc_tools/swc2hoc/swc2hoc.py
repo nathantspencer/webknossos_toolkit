@@ -1,6 +1,5 @@
 import numpy as np
 import sys
-import code
 import re
 import os
 import time
@@ -146,7 +145,6 @@ def branchpoints(swc_path, data):
 
 	has_child = []
 	bpoints = []
-	id_index = dict([(rec['id'], i) for i, rec in enumerate(data)])
 
 	for line in swc_lines:
 		line.strip()

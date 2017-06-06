@@ -13,7 +13,7 @@ def merge_nml(skeleton_folder, file_to_write):
     files_to_merge = glob.glob(skeleton_folder + '/*.nml')
 
     files_to_merge = []
-    for root, dirnames, filenames in os.walk(skeleton_folder, followlinks=True):
+    for root, _, filenames in os.walk(skeleton_folder, followlinks=True):
         for filename in fnmatch.filter(filenames, '*.nml'):
             files_to_merge.append(os.path.join(root, filename))
 
@@ -23,7 +23,6 @@ def merge_nml(skeleton_folder, file_to_write):
     thingCount = 0
     for ii, file in enumerate(files_to_merge):
         try:
-            hasBranchpoints = False
             thingCount += 1
 
             with open(file) as fd:
@@ -32,10 +31,6 @@ def merge_nml(skeleton_folder, file_to_write):
             if ii == 0:
                 parameters = SubElement(things, 'parameters')
                 SubElement(parameters, 'experiment', {'name ': doc['things']['parameters']['experiment']['@name']})
-                scale = SubElement(parameters, 'scale', {'x': doc['things']['parameters']['scale']['@x'],
-                                                         'y': doc['things']['parameters']['scale']['@y'],
-                                                         'z': doc['things']['parameters']['scale']['@z']})
-                time_ms = SubElement(parameters, 'time', {'ms': doc['things']['parameters']['time']['@ms']})
             if 'branchpoint' in doc['things'].keys() and doc['things']['branchpoints'].keys():
                 hasBranchpoints = True
             print file
@@ -51,7 +46,7 @@ def merge_nml(skeleton_folder, file_to_write):
             lastNodeCount = nodeCount
 
             for node in doc['things']['thing']['nodes']['node']:
-              
+
                 translateX = 0
                 translateY = 0
 

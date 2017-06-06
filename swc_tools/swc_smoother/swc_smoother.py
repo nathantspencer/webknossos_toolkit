@@ -1,5 +1,4 @@
 import sys
-import code
 
 def swc_smooth(swc_file, allowable_change):
 
@@ -19,7 +18,6 @@ def swc_smooth(swc_file, allowable_change):
         ys[int(line.split(' ')[0])] = float(line.split(' ')[3].strip())
         zs[int(line.split(' ')[0])] = float(line.split(' ')[4].strip())
 
-    new_radii = []
     count = 4
     while count > 3:
         count = 0
