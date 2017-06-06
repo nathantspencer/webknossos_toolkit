@@ -1,5 +1,4 @@
 import sys
-import code
 
 def components(swc_path):
 
