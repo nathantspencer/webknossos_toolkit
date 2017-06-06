@@ -22,7 +22,7 @@ def merge_nml(skeleton_folder, file_to_write):
     nodeCount = 0
     thingCount = 0
     for ii, filename in enumerate(files_to_merge):
-        try:
+       try:
             thingCount += 1
 
             with open(filename) as fd:
@@ -80,8 +80,8 @@ def merge_nml(skeleton_folder, file_to_write):
                 edge = SubElement(edges, 'edge', {'source': (str(int(edge['@source']) + lastNodeCount)),
                                                   'target': (str(int(edge['@target']) + lastNodeCount))})
 
-        except:
-            print 'ERROR -- file ' + filename + ' is malformed or empty, try redownloading it.'
+       except KeyError, e:
+        print '\nERROR -- File ' + filename + ' is malformed or empty, try redownloading it.\nKeyError: ' + str(e) + '\n'
 
     tree = ElementTree(things)
     tree.write(file_to_write)
