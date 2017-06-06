@@ -78,8 +78,7 @@ def split_nml(nmls_path):
                     j = 0
                     for comment_node in comment_nodes:
                         if node_min < comment_node <= node_max:
-                            current_file.write('  <comment node="' + str(comment_node) + '" content="' + \
-                                                comments[j] + '"/>\n')
+                            current_file.write('  <comment node="' + str(comment_node) + '" content="' + comments[j] + '"/>\n')
                         j += 1
 
                     current_file.write('  </comments>\n</things>')

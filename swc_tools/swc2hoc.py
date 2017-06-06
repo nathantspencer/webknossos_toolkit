@@ -3,6 +3,7 @@ import sys
 import re
 import os
 import time
+import swc_corrector
 from operator import itemgetter
 
 def reparent(swc_path, data, node_id):
@@ -61,43 +62,6 @@ def comment(hoc_path, soma_size):
 	f = open(hoc_path[:-4] + "_commented.hoc", 'w')
 	for line in hoc_lines_output:
 		f.write(line)
-	f.close()
-
-def correct(filePath):
-	lines_to_write = []
-	index_map = {'-1':-1}
-	f = open(filePath, 'r')
-	lines = f.readlines()
-	f.close()
-	n = 1
-	for line in lines:
-		line = line.strip()
-		lines[n-1] = line
-		index_map[line.split()[0]] = n
-		n += 1
-
-	for line in lines:
-		new_child = index_map[line.split()[0]]
-		line = line[len(line.split()[0]):]
-		line = str(new_child) + line
-		lines_to_write.append(line)
-
-	n = 0
-	for line in lines_to_write:
-		new_parent = index_map[(line.split()[6]).strip()]
-		line = line[:-len(line.split()[6])]
-
-		# correct nodes that reference themselves as parent; make root
-		if(line.split()[0] == str(new_parent)):
-			new_parent = -1
-
-		line = line + str(new_parent)
-		lines_to_write[n] = line
-		n += 1
-
-	f = open(filePath[:-4] + '_corrected.swc', 'w')
-	for line in lines_to_write:
-		f.write(line + '\n')
 	f.close()
 
 # find and returns a list of tuples (beginning node id of section, end node id of section)
@@ -192,7 +156,7 @@ def write_hoc(swc_path, soma_path, data):
 		f.write(line.strip().split()[2] + ', ')
 		f.write(line.strip().split()[3] + ', ')
 		f.write(line.strip().split()[4] + ', ')
-		f.write(str(int(line.strip().split()[5])*2) + ')\n')
+		f.write(str(float(line.strip().split()[5])*2) + ')\n')
 	f.write('}\n\n')
 
 	# All following sections are assumed to be dendrite sections
@@ -409,8 +373,8 @@ def main():
 		new_soma_path = soma_path[:-4] + '_centered.swc'
 
 		# correct order
-		correct(new_path)
-		correct(new_soma_path)
+		swc_corrector.correct(new_path)
+		swc_corrector.correct(new_soma_path)
 		new_path = new_path[:-4] + '_corrected.swc'
 		new_soma_path = new_soma_path[:-4] + '_corrected.swc'
 
@@ -446,7 +410,7 @@ def main():
 		new_path = new_path[:-4]  + '_reordered.hoc'
 
 		# comment
-		comment(new_path[:-4] + '_saved.hoc', soma_size)
+		comment(new_path, soma_size)
 
 		# delete temporary intermediate files
 		os.remove(soma_path[:-4] + '_centered.swc')
@@ -456,8 +420,8 @@ def main():
 		os.remove(swc_path[:-4] + '_centered_corrected.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.swc')
 		os.remove(swc_path[:-4] + '_centered_corrected_reparent.hoc')
-		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_saved.hoc', swc_path[:-4] + '.hoc')
-		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_saved_commented.hoc', swc_path[:-4] + '_commented.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered.hoc', swc_path[:-4] + '.hoc')
+		os.rename(swc_path[:-4] + '_centered_corrected_reparent_reordered_commented.hoc', swc_path[:-4] + '_commented.hoc')
 
 		end = time.time()
 		print("Finished in " + str(end - start) + " seconds.\n")
