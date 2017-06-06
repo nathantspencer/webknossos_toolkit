@@ -28,30 +28,30 @@ def components(swc_path):
 
 	# dfs to set color of each connected component
 	for ii, _ in enumerate(root_indices):
-		dfs_stack = []
-		current_index = root_indices[ii]
-		dfs_stack.append( current_index )
-
-		while dfs_stack:
-			current_index = dfs_stack.pop()
-			index_to_type[ current_index ] = ii;
-			if current_index in parent_to_child:
-				for j in parent_to_child[ current_index ]:
-					dfs_stack.append(j)
-			else:
-				print('Something seems to have gone wrong with the DFS.')
+		dfs(ii, root_indices, index_to_type, parent_to_child)
 
 	f = open(swc_path[:-4] + '_components.swc', 'w')
-
-	code.interact(local=locals())
 
 	for line in lines:
 		if line.split()[0] in index_to_type:
 			f.write(str(line.split()[0]) + ' ' + str(index_to_type[ line.split()[0] ]) + ' ' + str(line.split()[2]) + \
 				' ' + str(line.split()[3]) + ' ' + str(line.split()[4]) + ' ' + str(line.split()[5]) + \
 				' ' + str(line.split()[6].strip()) + '\n')
-
 	f.close()
+
+
+def dfs(index, root_indices, index_to_type, parent_to_child):
+	dfs_stack = []
+	current_index = root_indices[index]
+	dfs_stack.append(current_index)
+
+	while dfs_stack:
+		current_index = dfs_stack.pop()
+		index_to_type[current_index] = index;
+		if current_index in parent_to_child:
+			for j in parent_to_child[current_index]:
+				dfs_stack.append(j)
+
 
 if __name__ == "__main__":
 	if len(sys.argv) != 2:
