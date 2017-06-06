@@ -27,19 +27,19 @@ def components(swc_path):
 				parent_to_child[ parent ].append( sub_line.split()[0].strip() )
 
 	# dfs to set color of each connected component
-	for i in range(len(root_indices)):
+	for ii, _ in enumerate(root_indices):
 		dfs_stack = []
-		current_index = root_indices[ i ]
+		current_index = root_indices[ii]
 		dfs_stack.append( current_index )
 
 		while dfs_stack:
 			current_index = dfs_stack.pop()
-			index_to_type[ current_index ] = i;
+			index_to_type[ current_index ] = ii;
 			if current_index in parent_to_child:
 				for j in parent_to_child[ current_index ]:
 					dfs_stack.append(j)
 			else:
-				print('fack')
+				print('Something seems to have gone wrong with the DFS.')
 
 	f = open(swc_path[:-4] + '_components.swc', 'w')
 

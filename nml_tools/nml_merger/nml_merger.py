@@ -21,11 +21,11 @@ def merge_nml(skeleton_folder, file_to_write):
 
     nodeCount = 0
     thingCount = 0
-    for ii, file in enumerate(files_to_merge):
+    for ii, filename in enumerate(files_to_merge):
         try:
             thingCount += 1
 
-            with open(file) as fd:
+            with open(filename) as fd:
                 doc = xmltodict.parse(fd.read())
 
             if ii == 0:
@@ -33,7 +33,7 @@ def merge_nml(skeleton_folder, file_to_write):
                 SubElement(parameters, 'experiment', {'name ': doc['things']['parameters']['experiment']['@name']})
             if 'branchpoint' in doc['things'].keys() and doc['things']['branchpoints'].keys():
                 hasBranchpoints = True
-            print file
+            print filename
 
             thing = SubElement(things, 'thing', {'id': str(thingCount),
                                                  'color.r': doc['things']['thing']['@color.r'],
@@ -83,7 +83,7 @@ def merge_nml(skeleton_folder, file_to_write):
                                                   'target': (str(int(edge['@target']) + lastNodeCount))})
 
         except:
-            print 'ERROR -- file ' + file + ' is malformed or empty, try redownloading it.'
+            print 'ERROR -- file ' + filename + ' is malformed or empty, try redownloading it.'
 
     tree = ElementTree(things)
     tree.write(file_to_write)

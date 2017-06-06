@@ -5,15 +5,15 @@ import os
 import time
 from operator import itemgetter
 
-def reparent(swc_path, data, id):
-	cur_id = id
-	newparent = -1
-	while cur_id != -1:
-		line = data[cur_id - 1]
-		oldparent = line['parent']
-		line['parent'] = newparent
-		newparent = cur_id
-		cur_id = oldparent
+def reparent(swc_path, data, node_id):
+	current_id = node_id
+	new_parent = -1
+	while current_id != -1:
+		line = data[current_id - 1]
+		old_parent = line['parent']
+		line['parent'] = new_parent
+		new_parent = current_id
+		current_id = old_parent
 	np.savetxt(swc_path[:-4] + '_reparent.swc', data, fmt="%d %d %.3f %.3f %.3f %.3f %d")
 
 def comment(hoc_path, soma_size):
@@ -168,7 +168,7 @@ def write_hoc(swc_path, soma_path, data):
 
 	secs = sections(swc_path, data)
 	parent_list = []
-	for x in range(len(secs)):
+	for ii, _ in enumerate(secs):
 		parent_list.append(secs[x][1])
 
 	f.close()
