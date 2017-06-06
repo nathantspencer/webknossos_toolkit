@@ -56,8 +56,9 @@ def split_nml(nmls_path):
                 files_to_write[number_of_skeletons-1].write(line)
             if comments_flag and '<comments>' not in line and '</comments>' not in line:
                 m = re.match('[ ]+<comment node="([1-9a-zA-z]+)" content="([1-9a-zA-z]+)"/>', line)
-                comment_nodes.append(int(m.group(1)))
-                comments.append(m.group(2))
+                if m:
+                    comment_nodes.append(int(m.group(1)))
+                    comments.append(m.group(2))
 
             # Check for flag deactivation
             if '</parameters>' in line:
