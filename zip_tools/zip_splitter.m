@@ -15,6 +15,7 @@ function zip_splitter(zip_file)
 
 zip_file_name = zip_file(1:length(zip_file)-4);
 unzip(zip_file);
+unzip('data');
 globbers = glob('**.raw');
 raws = cell(length(globbers), 1);
 for i=1:numel(globbers)
@@ -90,5 +91,8 @@ for j=1:number_of_cells
        delete(current_raws{k});
     end
 end
+
+delete('data.zip');
+rmdir('1', 's');
 
 %--------------------------------------------------------------------------
