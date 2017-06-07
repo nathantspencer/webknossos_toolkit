@@ -87,10 +87,6 @@ def correct(swc, child_list, child_parent, node_id):
         line = line[:-len(line.split(' ')[6])] + str(index_map[(line.split(' ')[6])[:-1]])
         lines_to_write[n] = line
         n += 1
-        if node_id in child_list:
-            node_parent = child_parent[child_list.index(node_id)][1]
-        else:
-            node_parent = -1
     return lines_to_write
 
 if __name__ == "__main__":

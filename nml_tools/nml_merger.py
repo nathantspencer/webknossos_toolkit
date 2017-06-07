@@ -34,7 +34,7 @@ def merge_nml(skeleton_folder, file_to_write):
             print filename
 
             nodeCount = buildTree(doc, things, thingCount, nodeCount)
-            
+      
        except KeyError, e:
         print '\nERROR -- File ' + filename + ' is malformed or empty, try redownloading it.\nKeyError: ' + str(e) + '\n'
 
