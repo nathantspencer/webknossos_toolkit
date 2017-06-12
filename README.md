@@ -1,6 +1,7 @@
 # **webknossos_toolkit**
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/46e94d1529b749e1bbea0548a219953d)](https://www.codacy.com/app/nathantspencer/webknossos_toolkit?utm_source=github.com&utm_medium=referral&utm_content=nathantspencer/webknossos_toolkit&utm_campaign=badger)
+[![codebeat badge](https://codebeat.co/badges/eb498e73-bc23-410d-813e-977cd29eb3b9)](https://codebeat.co/projects/github-com-nathantspencer-webknossos_toolkit-master)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nathantspencer/webknossos_toolkit/blob/master/LICENSE.md)
 
 You might know `.nml` files from your favorite online skeletonizing application: webKnossos. You might have pockets full of `.zip` files of raw image data from your tracings. On the other hand, you might not know what to do with them. Look no further! This toolkit contains several tools to manipulate and make use of `.nml` and `.zip` files directly from webKnossos, as well as file types like `.swc` and `.hoc` that can be created from webKnossos files.
