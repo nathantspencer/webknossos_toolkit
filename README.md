@@ -99,7 +99,7 @@ You might know `.nml` files from your favorite online skeletonizing application:
 > Following execution of the script, a file will be created in the same directory as the original `.swc` and will have the same name with `_corrected` appended. This file should represent the same graphical structure, changing only the indices associated with each node.
 
 ## swc_cyclebreaker
-> he python script `swc_cyclebreaker.py` takes an `.swc` file without any root node (i.e. a graph with only one connected component which contains a loop). The node that should be made the root node should be indicated by setting its type to 1. An adjacency list will be created for the graph, from which a new graph will be drawn using the indicated node as the new root. The cycle in the graph will be eliminated. A usage example is given below.
+> The python script `swc_cyclebreaker.py` takes an `.swc` file without any root node (i.e. a graph with only one connected component which contains a loop). The node that should be made the root node should be indicated by setting its type to 1. An adjacency list will be created for the graph, from which a new graph will be drawn using the indicated node as the new root. The cycle in the graph will be eliminated. A usage example is given below.
 
 > **EX:** `$ python swc_cyclebreaker.py 'path\to\swc\file.swc'`
 
