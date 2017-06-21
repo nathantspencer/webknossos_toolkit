@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import glob
+import code
 
 def split_nmls(nmls_path):
     files_to_parse = []
@@ -36,7 +37,10 @@ def split_nml(nml_path):
             parameters_flag = True
         elif '<thing' in line and '<things>' not in line:
             thing_flag = True
-            files_to_write.append(open(nml_path + '_' + str(number_of_skeletons+1) + '.nml', 'w'))
+            name = re.match('(.*?)name=\"(.*?)\"', line)
+
+            name = name.groups()[-1]
+            files_to_write.append(open(os.path.dirname(nml_path) + name + '.nml', 'w'))
             nodes_in_thing.append(0)
             number_of_skeletons += 1
             for parameters_line in parameters_lines:
