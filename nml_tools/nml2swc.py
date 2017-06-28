@@ -1,5 +1,6 @@
 import glob
 import os
+import re
 import sys
 import defusedxml.ElementTree as ET
 
@@ -30,6 +31,7 @@ def write_swc(nmls_path, radius=0):
         for thing in thing_list:
             nodes = thing.find('nodes')
             edges = thing.find('edges')
+            comments = thing.find('comments')
 
             child_parent = []
             for edge in edges.findall('edge'):
@@ -40,10 +42,21 @@ def write_swc(nmls_path, radius=0):
             child_list = [pair[0] for pair in child_parent]
             node_id, node_x, node_y, node_z, node_parent = ['']*5
 
+            # parse comments to give special type to some swc nodes later
+            id_to_type = {}
+            for comment in comments.findall('comment'):
+                comment_text = comment.get('content')
+                if re.search('[Ii][Nn][Pp][Uu][Tt]', comment_text):
+                    id_to_type[comment.get('node')] = 7
+                elif re.search('[Ll][Oo][Ss][Tt]', comment_text):
+                    id_to_type[comment.get('node')] = 6
+                elif re.search('[Mm][Yy][Ee][Ll][Ii][Nn]', comment_text):
+                    id_to_type[comment.get('node')] = 0
+
             for node in nodes.findall('node'):
                 node_id = node.get('id')
-                node_x = node.get('x')
-                node_y = node.get('y')
+                node_x = float(node.get('x'))
+                node_y = float(node.get('y'))
                 node_z = float(node.get('z')) * 5.4545
                 if node_radius == 0:
                     node_radius = node.get('radius')
@@ -54,7 +67,11 @@ def write_swc(nmls_path, radius=0):
                     node_parent = -1
 
                 swc = open(swcs[nml_count], 'a')
-                swc.write(str(node_id) + ' 3 ' + str(node_x) + ' ' + str(node_y) + ' ' + str(node_z) + ' ' + str(node_radius) + ' ' + str(node_parent) + '\n')
+                if node_id in id_to_type:
+                    node_type = id_to_type[node_id]
+                else:
+                    node_type = 3
+                swc.write(str(node_id) + ' ' + str(node_type) + ' ' + str(node_x) + ' ' + str(node_y) + ' ' + str(node_z) + ' ' + str(node_radius) + ' ' + str(node_parent) + '\n')
                 swc.close()
 
     # correct indexing: enforce consecutive natural numbering
