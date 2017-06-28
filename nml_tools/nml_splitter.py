@@ -40,7 +40,7 @@ def split_nml(nml_path):
             name = re.match('(.*?)name=\"(.*?)\"', line)
 
             name = name.groups()[-1]
-            files_to_write.append(open(os.path.dirname(nml_path) + name + '.nml', 'w'))
+            files_to_write.append(open(os.path.dirname(nml_path) + '/' + name + '.nml', 'w'))
             nodes_in_thing.append(0)
             number_of_skeletons += 1
             for parameters_line in parameters_lines:
