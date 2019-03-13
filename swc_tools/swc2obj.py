@@ -16,6 +16,8 @@ def write_obj(swc_path):
         current_swc.close()
 
         for line in lines:
+            if not line.strip() or line[0] == '#':
+                continue
             swc_components = line.split(' ')
             lines_to_write.append('v ' + swc_components[2] + ' ' + swc_components[3] + \
                 ' ' + swc_components[4] + '\n')
